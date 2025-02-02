@@ -1,14 +1,14 @@
-import { Routes, Route } from 'react-router-dom';
-import History from './pages/history';
-import Home from './pages/home';
-import Login from './pages/login';
-import Signup from './pages/signup';
-import Profile from './pages/profile';
-import Navbar from './components/navbar';
+import { Routes, Route } from "react-router-dom";
+import History from "./pages/history";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import Signup from "./pages/signup";
+import Profile from "./pages/profile";
+import Navbar from "./components/navbar";
 function App() {
-
   return (
     <>
+    
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
