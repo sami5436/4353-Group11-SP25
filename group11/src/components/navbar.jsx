@@ -27,7 +27,12 @@ function Navbar() {
             </li>
             <li>
               <Link to="profile" className="text-[#F8F9FA] hover:text-emerald-300">
-                Profile Management
+                User Profile Management
+              </Link>
+            </li>
+            <li>
+              <Link to="adminDashboard" className="text-[#F8F9FA] hover:text-emerald-300">
+                Admin Profile Management
               </Link>
             </li>
             <li>
