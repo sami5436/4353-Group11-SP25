@@ -43,7 +43,7 @@ function AdminNavbar() {
           </Link>
 
           <Link
-            to="/admin/event-reports"
+            to="/admin/history"
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
           >
             <ClipboardList size={20} />
