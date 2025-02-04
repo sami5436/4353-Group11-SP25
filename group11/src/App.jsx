@@ -7,23 +7,21 @@ import Profile from "./pages/profile";
 import AdminDashboard from "./pages/adminDashboard";
 import Navbar from "./components/navbar";
 
-
 function App() {
   const location = useLocation();
-  const hideNavbarPaths = ['/adminDashboard'];
+  const hideNavbarPaths = ["/admin/profile", "/volunteer/history","/volunteer/profile"];
   const shouldShowNavbar = !hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
-    
       {shouldShowNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="signup" element={<Signup />} />
         <Route path="login" element={<Login />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="adminDashboard" element={<AdminDashboard />} />
-        <Route path="history" element={<History />} />
+        <Route path="volunteer/profile" element={<Profile />} />
+        <Route path="admin/profile" element={<AdminDashboard />} />
+        <Route path="volunteer/history" element={<History />} />
       </Routes>
     </>
   );

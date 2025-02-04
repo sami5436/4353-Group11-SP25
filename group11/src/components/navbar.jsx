@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { User } from "lucide-react";
 
 function Navbar() {
   return (
@@ -16,28 +17,18 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="login" className="text-[#F8F9FA] hover:text-emerald-300">
-                Login
+              <Link to="about-us" className="text-[#F8F9FA] hover:text-emerald-300">
+                About Us
               </Link>
             </li>
             <li>
-              <Link to="signup" className="text-[#F8F9FA] hover:text-emerald-300">
-                Sign Up
+              <Link to="contact-us" className="text-[#F8F9FA] hover:text-emerald-300">
+                Contact Us
               </Link>
             </li>
             <li>
-              <Link to="profile" className="text-[#F8F9FA] hover:text-emerald-300">
-                User Profile Management
-              </Link>
-            </li>
-            <li>
-              <Link to="adminDashboard" className="text-[#F8F9FA] hover:text-emerald-300">
-                Admin Profile Management
-              </Link>
-            </li>
-            <li>
-              <Link to="history" className="text-[#F8F9FA] hover:text-emerald-300">
-                History
+              <Link to="/login" className="text-[#F8F9FA] hover:text-emerald-300 flex items-center">
+                <User className="mr-2" size={20} />
               </Link>
             </li>
           </ul>
