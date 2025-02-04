@@ -6,10 +6,10 @@ import Signup from "./pages/signup";
 import Profile from "./pages/profile";
 import AdminDashboard from "./pages/adminDashboard";
 import Navbar from "./components/navbar";
-
+import EventHistory from "./components/adminEventHistory";
 function App() {
   const location = useLocation();
-  const hideNavbarPaths = ["/admin/profile", "/volunteer/history","/volunteer/profile"];
+  const hideNavbarPaths = ["/admin/profile", "/volunteer/history","/volunteer/profile", "/admin/history"];
   const shouldShowNavbar = !hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -22,6 +22,7 @@ function App() {
         <Route path="volunteer/profile" element={<Profile />} />
         <Route path="admin/profile" element={<AdminDashboard />} />
         <Route path="volunteer/history" element={<History />} />
+        <Route path="admin/history" element={<EventHistory />} />
       </Routes>
     </>
   );

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AdminNavbar from "../components/adminNavbar";
 import EventHistory from "../components/adminEventHistory";
-import { Home, Users, Calendar, ClipboardList, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
@@ -72,8 +71,13 @@ const AdminDashboard = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            <AdminNavbar />
-            <div className="flex-1 overflow-auto p-8">
+            {/* Fixed Sidebar */}
+            <div className="w-64 bg-white shadow-md fixed h-full">
+                <AdminNavbar />
+            </div>
+
+            {/* Main Content - Ensure it doesn't overlap */}
+            <div className="flex-1 ml-64 overflow-auto p-8">
                 {activeTab === "profile" && <ProfileContent />}
                 {activeTab === "events" && <EventHistory />}
                 {activeTab === "volunteers" && <div>Volunteers Management Content</div>}
