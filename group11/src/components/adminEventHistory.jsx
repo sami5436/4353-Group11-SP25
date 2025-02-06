@@ -1,5 +1,6 @@
 import React , { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import AdminNavbar from "./adminNavbar";
 
 const EventHistory = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -131,141 +132,147 @@ const EventHistory = () => {
 
 
     return (
-        <div className="p-8 relative">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold mb-6">Event History</h2>
-                <button
-                    onClick={handleCreateEvent}
-                    className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 flex items-center"
-                >
-                    + Create New Event
-                </button>
-            </div>
+<div className="flex">
+    {/* Sidebar (Assumed fixed width) */}
+    <AdminNavbar />
 
-            <EventsMap events={eventHistory} />
-            
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <table className="w-full border border-gray-300 shadow-md">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="p-3 text-left">Event Name</th>
-                            <th className="p-3 text-left">Date</th>
-                            <th className="p-3 text-left">Street</th>
-                            <th className="p-3 text-left">City</th>
-                            <th className="p-3 text-left">State</th>
-                            <th className="p-3 text-left">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {eventHistory.map((event, index) => (
-                            <tr key={index} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => handleEventClick(event)}>
-                                <td className="p-3">{event.eventName}</td>
-                                <td className="p-3">{event.date}</td>
-                                <td className="p-3">{event.street}</td>
-                                <td className="p-3">{event.city}</td>
-                                <td className="p-3">{event.state}</td>
-                                <td className={`p-3 ${
-                                        event.status === 'Completed' ? 'text-green-700' :
-                                        event.status === 'Upcoming' ? 'text-yellow-500' :
-                                        event.status === 'Cancelled' ? 'text-red-600' : ''
-                                    }`}
-                                    >
-                                    {event.status}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+    {/* Main content */}
+    <div className="p-8 relative ml-[280px] w-full">
+        <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold mb-6">Event History</h2>
+            <button
+                onClick={handleCreateEvent}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 flex items-center"
+            >
+                + Create New Event
+            </button>
+        </div>
 
-            {/*Modal showing individual events for the admin to change */}
-            {selectedEvent && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center">
-                    <div className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold">
-                                {isCreating ? 'Create New Event' : 'Edit Event'}
-                            </h3>
-                            <button 
-                                onClick={handleClose}
-                                className="text-lg text-gray-500 hover:text-gray-700 hover:cursor-pointer"
-                            >
-                                ×
-                            </button>
-                        </div>
+        <EventsMap events={eventHistory} />
 
-                        <div className="grid grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Event Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editedEvent.eventName}
-                                    onChange={(e) => handleEventChange('eventName', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Date
-                                </label>
-                                <input
-                                    type="date"
-                                    value={editedEvent.date}
-                                    onChange={(e) => handleEventChange('date', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Street
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editedEvent.street}
-                                    onChange={(e) => handleEventChange('street', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    City
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editedEvent.city}
-                                    onChange={(e) => handleEventChange('city', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    State
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editedEvent.state}
-                                    onChange={(e) => handleEventChange('state', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Status
-                                </label>
-                                <select
-                                    type="text"
-                                    value={editedEvent.status}
-                                    onChange={(e) => handleEventChange('status', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        {/* Table without unnecessary margins */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+            <table className="w-full border border-gray-300 shadow-md">
+                <thead>
+                    <tr className="bg-gray-200">
+                        <th className="p-3 text-left">Event Name</th>
+                        <th className="p-3 text-left">Date</th>
+                        <th className="p-3 text-left">Street</th>
+                        <th className="p-3 text-left">City</th>
+                        <th className="p-3 text-left">State</th>
+                        <th className="p-3 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {eventHistory.map((event, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => handleEventClick(event)}>
+                            <td className="p-3">{event.eventName}</td>
+                            <td className="p-3">{event.date}</td>
+                            <td className="p-3">{event.street}</td>
+                            <td className="p-3">{event.city}</td>
+                            <td className="p-3">{event.state}</td>
+                            <td className={`p-3 ${
+                                    event.status === 'Completed' ? 'text-green-700' :
+                                    event.status === 'Upcoming' ? 'text-yellow-500' :
+                                    event.status === 'Cancelled' ? 'text-red-600' : ''
+                                }`}
                                 >
-                                    <option value='Upcoming'>Upcoming</option>
-                                    <option value='Completed'>Completed</option>
-                                    <option value='Cancelled'>Cancelled</option>
-                                </select>
-                            </div>
-                            <div className="col-span-2">
+                                {event.status}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        {/* Modal Centering Fix */}
+        {selectedEvent && (
+            <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-semibold">
+                            {isCreating ? 'Create New Event' : 'Edit Event'}
+                        </h3>
+                        <button 
+                            onClick={handleClose}
+                            className="text-lg text-gray-500 hover:text-gray-700 hover:cursor-pointer"
+                        >
+                            ×
+                        </button>
+                    </div>
+                    
+                    {/* Form */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Event Name
+                            </label>
+                            <input
+                                type="text"
+                                value={editedEvent.eventName}
+                                onChange={(e) => handleEventChange('eventName', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Date
+                            </label>
+                            <input
+                                type="date"
+                                value={editedEvent.date}
+                                onChange={(e) => handleEventChange('date', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Street
+                            </label>
+                            <input
+                                type="text"
+                                value={editedEvent.street}
+                                onChange={(e) => handleEventChange('street', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                City
+                            </label>
+                            <input
+                                type="text"
+                                value={editedEvent.city}
+                                onChange={(e) => handleEventChange('city', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                State
+                            </label>
+                            <input
+                                type="text"
+                                value={editedEvent.state}
+                                onChange={(e) => handleEventChange('state', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Status
+                            </label>
+                            <select
+                                value={editedEvent.status}
+                                onChange={(e) => handleEventChange('status', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value='Upcoming'>Upcoming</option>
+                                <option value='Completed'>Completed</option>
+                                <option value='Cancelled'>Cancelled</option>
+                            </select>
+                        </div>
+                        <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Description
                                 </label>
@@ -276,26 +283,28 @@ const EventHistory = () => {
                                     rows="4"
                                 />
                             </div>
-                        </div>
+                    </div>
 
-                        <div className="mt-6 flex justify-end space-x-3">
-                            <button
-                                onClick={handleClose}
-                                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
-                            >
-                                {isCreating ? 'Create Event' : 'Save Changes'}
-                            </button>
-                        </div>
-                    </div>                 
-                </div>
-            )}
-        </div>
+                    <div className="mt-6 flex justify-end space-x-3">
+                        <button
+                            onClick={handleClose}
+                            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
+                        >
+                            {isCreating ? 'Create Event' : 'Save Changes'}
+                        </button>
+                    </div>
+                </div>                 
+            </div>
+        )}
+    </div>
+</div>
+
     );
 };
 
