@@ -18,8 +18,8 @@ const AdminDashboard = () => {
     };
 
     const ProfileContent = () => (
-        <div className="p-8">
-            <div className="mb-16">
+        <div className="p-1">
+            <div className="mb-10">
                 <h2 className="text-3xl font-semibold mb-2">Welcome!</h2>
                 <p className="text-xl text-gray-600 font-medium mb-5">Admin ID: {profileData.adminId}</p>
             </div>

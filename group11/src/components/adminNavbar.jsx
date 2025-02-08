@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Home, Users, Calendar, ClipboardList, LogOut } from "lucide-react";
+import NotificationDropdown from "./notificationDropdown";
 
 function AdminNavbar() {
   return (
@@ -12,6 +13,7 @@ function AdminNavbar() {
         >
           <span className="text-xl font-bold">Group 11</span>
         </Link>
+        <NotificationDropdown />
       </div>
 
       <div className="p-4">
