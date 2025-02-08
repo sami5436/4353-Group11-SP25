@@ -134,7 +134,7 @@ const EventHistory = () => {
     return (
 <div className="flex">
     {/* Sidebar (Assumed fixed width) */}
-    <AdminNavbar />
+    
 
     {/* Main content */}
     <div className="p-6 relative ml-[260px] w-full">
@@ -303,6 +303,7 @@ const EventHistory = () => {
             </div>
         )}
     </div>
+    <AdminNavbar />
 </div>
 
     );
