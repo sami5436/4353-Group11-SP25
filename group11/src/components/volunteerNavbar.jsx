@@ -35,6 +35,13 @@ function VolunteerNavbar() {
           </Link>
 
           <Link
+            to="/volunteer/assignments"
+            className="flex items-center space-x-2 text-gray-300 hover:text-white"
+          >
+            <ClipboardList size={20} />
+            <span>Volunteer Assignments</span>
+          </Link>
+          <Link
             to="/volunteer/history"
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
           >
