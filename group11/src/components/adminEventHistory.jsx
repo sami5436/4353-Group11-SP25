@@ -134,10 +134,10 @@ const EventHistory = () => {
     return (
 <div className="flex">
     {/* Sidebar (Assumed fixed width) */}
-    <AdminNavbar />
+    
 
     {/* Main content */}
-    <div className="p-8 relative ml-[280px] w-full">
+    <div className="p-6 relative ml-[260px] w-full">
         <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold mb-6">Event History</h2>
             <button
@@ -303,6 +303,7 @@ const EventHistory = () => {
             </div>
         )}
     </div>
+    <AdminNavbar />
 </div>
 
     );
