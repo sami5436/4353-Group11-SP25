@@ -14,6 +14,8 @@ const EventHistory = () => {
         city: '',
         state: '',
         status: 'Upcoming',
+        urgency: '',
+        skills: [],
         description: ''
     }
 
@@ -25,9 +27,9 @@ const EventHistory = () => {
             city: 'Las Vegas',
             state: 'Nevada',
             status: 'Upcoming',
-            description: 'Annual toy drive to collect toys for children in need during the holiday season.',
-            lat: '36.113960',
-            lng: '-115.173080'
+            urgency: 'Medium',
+            skills: ['Event Coordination', 'Public Speaking', 'Language Translation'],
+            description: 'Annual toy drive to collect toys for children in need during the holiday season.'
         },
         {
             eventName: 'Tree Planting',
@@ -36,6 +38,8 @@ const EventHistory = () => {
             city: 'Houston',
             state: 'Texas',
             status: 'Upcoming',
+            urgency: 'High',
+            skills: ['Event Coordination', 'Manual Labor', 'First Aid & CPR'],
             description: 'Community event to plant trees in local parks and neighborhoods.'
         },
         {
@@ -45,6 +49,8 @@ const EventHistory = () => {
             city: 'Carson',
             state: 'California',
             status: 'Cancelled',
+            urgency: 'Medium',
+            skills: ['Event Coordination', 'Public Speaking', 'Food Services'],
             description: 'Annual fundraising gala to support local charitable initiatives.'
         },
         {
@@ -54,6 +60,8 @@ const EventHistory = () => {
             city: 'El Paso',
             state: 'Texas',
             status: 'Completed',
+            urgency: 'High',
+            skills: ['Public Speaking', 'Language Translation', 'Teaching'],
             description: 'Educational and recreational activities for underprivileged children.'
         },
         {
@@ -63,6 +71,8 @@ const EventHistory = () => {
             city: 'Mason',
             state: 'Ohio',
             status: 'Completed',
+            urgency: ':ow',
+            skills: ['Arts & Crafts', 'Public Speaking', 'Language Translation', 'Teaching'],
             description: 'Educational and recreational activities for underprivileged children.'
         }
     ];
@@ -92,7 +102,16 @@ const EventHistory = () => {
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = (e) => {
+        e.preventDefault();
+        const requiredFields = ['eventName', 'date', 'street', 'city', 'state', 'status', 'urgency'];
+        const missingFields = requiredFields.filter(field => !editedEvent[field]);
+        
+        if (missingFields.length > 0 || editedEvent.skills.length === 0) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
         {/* this is where i'll send the update to the backend to save the new event info */}
         console.log('Saving event changes: ', editedEvent);
         handleClose();
@@ -214,6 +233,7 @@ const EventHistory = () => {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                             />
                         </div>
+                        
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Date
@@ -267,9 +287,117 @@ const EventHistory = () => {
                                 onChange={(e) => handleEventChange('status', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                             >
-                                <option value='Upcoming'>Upcoming</option>
-                                <option value='Completed'>Completed</option>
-                                <option value='Cancelled'>Cancelled</option>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Required Skills
+                            </label>
+
+                            <div className="mb-3">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Add a new skill..."
+                                        id="newSkill"
+                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && e.target.value.trim()) {
+                                                e.preventDefault();
+                                                // Check if skill already exists will be done locally
+                                                if (!editedEvent.skills.includes(e.target.value.trim())) {
+                                                    handleEventChange('skills', [...editedEvent.skills, e.target.value.trim()]);
+                                                }
+                                                e.target.value = '';
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            const input = document.getElementById('newSkill');
+                                            if (input.value.trim()) {
+                                                if (!editedEvent.skills.includes(input.value.trim())) {
+                                                    handleEventChange('skills', [...editedEvent.skills, input.value.trim()]);
+                                                }
+                                                input.value = ''; 
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
+                                {/* skills will come from database records */}
+                                {["Arts & Crafts", "Language Translation", "First Aid & CPR", "Manual Labor", "Public Speaking", "Event Coordination", "Teaching", "Food Services", "Technical Support"].map((skill) => (
+                                    <div key={skill} className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id={`skill-${skill}`}
+                                            checked={editedEvent.skills.includes(skill)}
+                                            onChange={(e) => {
+                                                const updatedSkills = e.target.checked
+                                                    ? [...editedEvent.skills, skill]
+                                                    : editedEvent.skills.filter((s) => s !== skill);
+                                                handleEventChange('skills', updatedSkills);
+                                            }}
+                                            className="h-4 w-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
+                                        />
+                                        <label htmlFor={`skill-${skill}`} className="text-sm text-gray-700">
+                                            {skill}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                            {editedEvent.skills.length > 0 && (
+                                <div className="mt-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        {editedEvent.skills.map((skill) => (
+                                            <span 
+                                                key={skill} 
+                                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm bg-emerald-100 text-emerald-700"
+                                            >
+                                                {skill}
+                                                <button
+                                                    onClick={() => {
+                                                        const updatedSkills = editedEvent.skills.filter(s => s !== skill);
+                                                        handleEventChange('skills', updatedSkills);
+                                                    }}
+                                                    className="hover:text-emerald-900"
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        ))}
+                                        <button
+                                            onClick={() => handleEventChange('skills', [])}
+                                            className="text-sm text-gray-500 hover:text-gray-700"
+                                        >
+                                            Clear all
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Urgency
+                            </label>
+                            <select
+                                value={editedEvent.urgency}
+                                onChange={(e) => handleEventChange('urgency', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                required
+                            >
+                                <option value="Select Urgency" hidden>Select urgency</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
                             </select>
                         </div>
                         <div className="col-span-2">
@@ -284,7 +412,6 @@ const EventHistory = () => {
                                 />
                             </div>
                     </div>
-
                     <div className="mt-6 flex justify-end space-x-3">
                         <button
                             onClick={handleClose}
