@@ -31,7 +31,7 @@ function volunteerAssignments() {
   return (
     <div className="flex min-h-screen overflow-hidden">
       <h2 className="text-3xl ml-76 mt-12 font-semibold">Find Your Assigned Events!</h2>
-      <h2 className="ml-76 mt-12 font-semibold">Click on the box below</h2>
+      {/* <h2 className="ml-76 mt-12 font-semibold">Click on the</h2> */}
       <VolunteerNavbar />
 
       <div className="flex h-[calc(100vh-4rem)]">
