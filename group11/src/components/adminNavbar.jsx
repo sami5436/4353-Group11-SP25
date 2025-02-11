@@ -13,7 +13,7 @@ function AdminNavbar() {
         >
           <span className="text-xl font-bold">Group 11</span>
         </Link>
-        <NotificationDropdown />
+        <NotificationDropdown userRole="admin" />
       </div>
 
       <div className="p-4">

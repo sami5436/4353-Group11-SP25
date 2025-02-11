@@ -2,29 +2,35 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 
-const NotificationDropdown = () => {
+const NotificationDropdown = ({ userRole = 'volunteer' }) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState([
         {
             id: 1,
-            type: 'volunteer_signup',
-            message: 'New volunteer signup: Jane Smith',
+            type: userRole === 'admin' ? 'volunteer_signup' : 'event_reminder',
+            message: userRole === 'admin' 
+                ? 'New volunteer signup: Jane Smith'
+                : 'Upcoming Event: Charity Gala tomorrow',
             timestamp: '2025-02-07T10:00:00',
             read: false
         },
         {
             id: 2,
-            type: 'event_update',
-            message: 'Event "Charity Gala" has been modified',
+            type: userRole === 'admin' ? 'event_update' : 'schedule_change',
+            message: userRole === 'admin'
+                ? 'Event "Charity Gala" has been modified'
+                : 'Your volunteer shift has been updated',
             timestamp: '2025-01-24T15:00:00',
             read: false
         },
         {
             id: 3,
-            type: 'event_creation',
-            message: 'Event "Toy Drive" has been created',
-            timestamp: '2025-01-24T17:00:00',
+            type: userRole === 'admin' ? 'event_creation' : 'new_event',
+            message: userRole === 'admin'
+                ? 'Event "Toy Drive" has been created'
+                : 'New volunteer opportunity available',
+            timestamp: '2025-01-08T17:00:00',
             read: false
         }
     ]);
@@ -38,10 +44,24 @@ const NotificationDropdown = () => {
     };
 
     const formatTime = (timestamp) => {
-        return new Date(timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffInHours = Math.abs(now - date) / 36e5;
+
+        if (diffInHours < 24) {
+            return date.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        return date.toLocaleDateString([], {
+            month: 'short',
+            day: 'numeric'
         });
+    };
+
+    const handleViewAll = () => {
+        navigate(userRole === "admin" ? '/admin/notifications' : '/volunteer/notifications');
     };
 
     return (
@@ -87,7 +107,7 @@ const NotificationDropdown = () => {
                     <div className="px-4 py-2 border-t border-gray-200">
                         <button
                             className="text-sm text-emerald-600 hover:text-emerald-800 cursor-pointer"
-                            onClick={() => navigate('/admin/notifications')}
+                            onClick={handleViewAll}
                         >
                             View all
                         </button>
