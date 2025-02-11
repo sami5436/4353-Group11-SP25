@@ -171,7 +171,7 @@ const EventHistory = () => {
 
         {/* Table without unnecessary margins */}
         <div className="bg-white rounded-lg shadow-md p-6">
-            <table className="w-full border border-gray-300 shadow-md">
+            <table className="w-full border border-gray-200 shadow-md">
                 <thead>
                     <tr className="bg-gray-200">
                         <th className="p-3 text-left">Event Name</th>
@@ -325,7 +325,7 @@ const EventHistory = () => {
                                                 input.value = ''; 
                                             }
                                         }}
-                                        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+                                        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
                                     >
                                         Add
                                     </button>
