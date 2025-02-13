@@ -1,4 +1,5 @@
 import React from "react";
+import { UserCheck, CheckSquare, CalendarRange } from "lucide-react";
 
 function Home() {
   return (
@@ -22,16 +23,44 @@ function Home() {
             </a>
           </div>
 
-          <div className="w-full mb-10 m-10">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="aspect-square bg-[#F8F9FA] text-black p-4 rounded-lg shadow-md">
-                Col 1
+          <div className="w-full mb-10 m-10 p-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-[#F8F9FA] text-black p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+                  <CalendarRange className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">For Volunteers</h3>
+                <p className="text-sm text-gray-600">
+                  Find meaningful volunteer opportunities that match your skills
+                  and interests. Browse local events, track your impact, and
+                  connect with causes you care about.
+                </p>
               </div>
-              <div className="aspect-square bg-[#F8F9FA] text-black p-4 rounded-lg shadow-md">
-                Col 2
+
+              <div className="bg-[#F8F9FA] text-black p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+                  <UserCheck className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">
+                  For Organizations
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Manage volunteers efficiently with our comprehensive
+                  dashboard. Track skills, availability, and engagement while
+                  coordinating events seamlessly.
+                </p>
               </div>
-              <div className="aspect-square bg-[#F8F9FA] text-black p-4 rounded-lg shadow-md">
-                Col 3
+
+              <div className="bg-[#F8F9FA] text-black p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+                  <CheckSquare className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Smart Matching</h3>
+                <p className="text-sm text-gray-600">
+                  Our intelligent matching system pairs volunteers with
+                  opportunities based on skills, interests, and availability,
+                  maximizing impact for everyone involved.
+                </p>
               </div>
             </div>
           </div>
@@ -44,7 +73,7 @@ function Home() {
             </div>
 
             <div className="text-center">
-              <button className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">
+              <button className="px-8 py-3 bg-emerald-800 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">
                 Sign Up Now
               </button>
             </div>
