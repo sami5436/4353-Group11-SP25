@@ -4,13 +4,18 @@ import { Pencil } from "lucide-react";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
+  const [showAddress2, setShowAddress2] = useState(false);
   const [profileData, setProfileData] = useState({
-    fullName: "Joe Biden",
+    firstName: "Joe",
+    lastName: "Biden",
     address1: "1600 Pennsylvania Avenue",
     address2: "",
-    city: "Washington",
-    state: "DC",
-    zipCode: "20500",
+    city1: "Washington",
+    city2: "",
+    state1: "DC",
+    state2: "",
+    zipCode1: "20500",
+    zipCode2: "",
     skills: [],
     preferences: "",
     availability: ""
@@ -51,8 +56,26 @@ function Profile() {
 
   const handleSave = (e) => {
     e.preventDefault();
+    
+    // If Address 2 section is shown, validate all its fields
+    if (showAddress2 && (!editedData.address2 || !editedData.city2 || !editedData.state2 || !editedData.zipCode2)) {
+      alert("Please fill out all fields for Address 2 or remove the second address section");
+      return;
+    }
+    
     setProfileData(editedData);
     setIsEditing(false);
+  };
+
+  const handleRemoveAddress2 = () => {
+    setShowAddress2(false);
+    setEditedData({
+      ...editedData,
+      address2: "",
+      city2: "",
+      state2: "",
+      zipCode2: ""
+    });
   };
 
   return (
@@ -60,7 +83,7 @@ function Profile() {
       <VolunteerNavbar />
       
       <div className="flex-1 ml-64 p-8">
-        <h1 className="text-3xl font-bold mb-6">Hello, {profileData.fullName.split(' ')[0]}!</h1>
+        <h1 className="text-3xl font-bold mb-6">Hello, {profileData.firstName}!</h1>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
@@ -79,63 +102,65 @@ function Profile() {
             )}
           </div>
 
-          <form onSubmit={handleSave} className="space-y-6">
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={isEditing ? editedData.fullName : profileData.fullName}
-                onChange={(e) => setEditedData({...editedData, fullName: e.target.value})}
-                disabled={!isEditing}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
-              />
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  value={isEditing ? editedData.firstName : profileData.firstName}
+                  onChange={(e) => setEditedData({...editedData, firstName: e.target.value})}
+                  disabled={!isEditing}
+                  required
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  value={isEditing ? editedData.lastName : profileData.lastName}
+                  onChange={(e) => setEditedData({...editedData, lastName: e.target.value})}
+                  disabled={!isEditing}
+                  required
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                />
+              </div>
             </div>
 
-            {/* Address 1 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address 1
+                Address 1 *
               </label>
               <input
                 type="text"
                 value={isEditing ? editedData.address1 : profileData.address1}
                 onChange={(e) => setEditedData({...editedData, address1: e.target.value})}
                 disabled={!isEditing}
+                required
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
                   ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
               />
             </div>
 
-            {/* Address 2 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address 2 (Optional)
-              </label>
-              <input
-                type="text"
-                value={isEditing ? editedData.address2 : profileData.address2}
-                onChange={(e) => setEditedData({...editedData, address2: e.target.value})}
-                disabled={!isEditing}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
-              />
-            </div>
-
-            {/* City, State, Zip */}
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
+                  City *
                 </label>
                 <input
                   type="text"
-                  value={isEditing ? editedData.city : profileData.city}
-                  onChange={(e) => setEditedData({...editedData, city: e.target.value})}
+                  value={isEditing ? editedData.city1 : profileData.city1}
+                  onChange={(e) => setEditedData({...editedData, city1: e.target.value})}
                   disabled={!isEditing}
+                  required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
                     ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
                 />
@@ -143,12 +168,13 @@ function Profile() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
+                  State *
                 </label>
                 <select
-                  value={isEditing ? editedData.state : profileData.state}
-                  onChange={(e) => setEditedData({...editedData, state: e.target.value})}
+                  value={isEditing ? editedData.state1 : profileData.state1}
+                  onChange={(e) => setEditedData({...editedData, state1: e.target.value})}
                   disabled={!isEditing}
+                  required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
                     ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
                 >
@@ -161,20 +187,115 @@ function Profile() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Zip Code
+                  Zip Code *
                 </label>
                 <input
                   type="text"
-                  value={isEditing ? editedData.zipCode : profileData.zipCode}
-                  onChange={(e) => setEditedData({...editedData, zipCode: e.target.value})}
+                  value={isEditing ? editedData.zipCode1 : profileData.zipCode1}
+                  onChange={(e) => setEditedData({...editedData, zipCode1: e.target.value})}
                   disabled={!isEditing}
+                  required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
                     ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
                 />
               </div>
             </div>
 
-            {/* Skills */}
+            {!showAddress2 && isEditing && (
+              <div className="flex justify-start">
+                <button
+                  type="button"
+                  onClick={() => setShowAddress2(true)}
+                  className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center"
+                >
+                  + Add Second Address
+                </button>
+              </div>
+            )}
+
+            {showAddress2 && (
+              <>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-gray-900">Second Address</h3>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveAddress2}
+                      className="text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Remove Address
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address 2 *
+                  </label>
+                  <input
+                    type="text"
+                    value={isEditing ? editedData.address2 : profileData.address2}
+                    onChange={(e) => setEditedData({...editedData, address2: e.target.value})}
+                    disabled={!isEditing}
+                    required
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                      ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      City *
+                    </label>
+                    <input
+                      type="text"
+                      value={isEditing ? editedData.city2 : profileData.city2}
+                      onChange={(e) => setEditedData({...editedData, city2: e.target.value})}
+                      disabled={!isEditing}
+                      required
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      State *
+                    </label>
+                    <select
+                      value={isEditing ? editedData.state2 : profileData.state2}
+                      onChange={(e) => setEditedData({...editedData, state2: e.target.value})}
+                      disabled={!isEditing}
+                      required
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    >
+                      <option value="">Select state</option>
+                      {states.map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Zip Code *
+                    </label>
+                    <input
+                      type="text"
+                      value={isEditing ? editedData.zipCode2 : profileData.zipCode2}
+                      onChange={(e) => setEditedData({...editedData, zipCode2: e.target.value})}
+                      disabled={!isEditing}
+                      required
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Skills
@@ -197,7 +318,6 @@ function Profile() {
               <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple skills</p>
             </div>
 
-            {/* Preferences */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Preferences
@@ -212,7 +332,6 @@ function Profile() {
               />
             </div>
 
-            {/* Availability */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Availability
@@ -227,7 +346,6 @@ function Profile() {
               />
             </div>
 
-            {/* Action Buttons */}
             {isEditing && (
               <div className="flex justify-end space-x-4">
                 <button
