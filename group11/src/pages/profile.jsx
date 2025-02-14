@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
+import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -32,17 +34,36 @@ function Profile() {
   ];
 
   const skillOptions = [
-    "Teaching",
-    "First Aid",
-    "Event Planning",
-    "Social Media",
-    "Cooking",
-    "Construction",
-    "Gardening",
     "Administrative",
+    "Community Outreach",
+    "Conflict Resolution",
+    "Construction",
+    "Cooking",
+    "Customer Service",
+    "Event Planning",
+    "First Aid",
     "Fundraising",
-    "Language Skills"
+    "Gardening",
+    "Graphic Design",
+    "IT Support",
+    "Language Skills",
+    "Leadership",
+    "Marketing",
+    "Photography",
+    "Project Management",
+    "Public Speaking",
+    "Social Media",
+    "Teaching",
+    "Tutoring",
+    "Web Development",
+    "Writing"
   ];
+
+  // Convert skillOptions array to format required by react-select
+  const skillSelectOptions = skillOptions.map(skill => ({
+    value: skill.toLowerCase(),
+    label: skill
+  }));
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -300,22 +321,34 @@ function Profile() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Skills
               </label>
-              <select
-                multiple
-                value={isEditing ? editedData.skills : profileData.skills}
-                onChange={(e) => setEditedData({
-                  ...editedData, 
-                  skills: Array.from(e.target.selectedOptions, option => option.value)
+              <CreatableSelect
+                isMulti
+                isDisabled={!isEditing}
+                value={skillSelectOptions.filter(option => 
+                  (isEditing ? editedData.skills : profileData.skills).includes(option.value)
+                )}
+                onChange={(selectedOptions) => setEditedData({
+                  ...editedData,
+                  skills: selectedOptions ? selectedOptions.map(option => option.value) : []
                 })}
-                disabled={!isEditing}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
-              >
-                {skillOptions.map(skill => (
-                  <option key={skill} value={skill}>{skill}</option>
-                ))}
-              </select>
-              <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple skills</p>
+                options={skillSelectOptions}
+                className="rounded-lg"
+                classNamePrefix="select"
+                placeholder="Type to search or add new skills..."
+                formatCreateLabel={(inputValue) => `Add "${inputValue}" as a new skill`}
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary: '#059669',
+                    primary25: '#f0fdf4',
+                    primary50: '#dcfce7',
+                  },
+                })}
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Search existing skills or type to add new ones
+              </p>
             </div>
 
             <div>
