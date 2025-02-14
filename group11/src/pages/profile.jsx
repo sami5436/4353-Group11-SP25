@@ -121,7 +121,7 @@ function Profile() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name *
+                  Last Name test*
                 </label>
                 <input
                   type="text"
