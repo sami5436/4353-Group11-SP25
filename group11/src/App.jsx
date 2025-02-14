@@ -11,9 +11,22 @@ import Navbar from "./components/navbar";
 import EventHistory from "./components/adminEventHistory";
 import VolunteerAssignments from "./pages/volunteerAssignments";
 import AdminManageVolunteers from "./pages/adminManageVolunteers";
+import AdminEventsReport from "./pages/adminEventsReport";
+
 function App() {
   const location = useLocation();
-  const hideNavbarPaths = ["/admin/profile", "/volunteer/history","/volunteer/profile", "/admin/manage-events","/volunteer/assignments","/admin/manage-volunteers", "/admin/notifications", "/volunteer/notifications"];
+  const hideNavbarPaths = [
+    "/admin/profile", 
+    "/volunteer/history",
+    "/volunteer/profile", 
+    "/admin/manage-events",
+    "/volunteer/assignments",
+    "/admin/manage-volunteers", 
+    "/admin/notifications", 
+    "/volunteer/notifications",
+    "/admin/events-report"
+  ];
+  
   const shouldShowNavbar = !hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -31,6 +44,7 @@ function App() {
         <Route path="admin/manage-volunteers" element={<AdminManageVolunteers />} />
         <Route path="admin/notifications" element={<AdminNotifications />} />
         <Route path="volunteer/notifications" element={<VolunteerNotifications />} />
+        <Route path="admin/events-report" element={<AdminEventsReport />} />
       </Routes>
     </>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, Users, Calendar, ClipboardList, LogOut } from "lucide-react";
+import { Home, Users, Calendar, ClipboardList, LogOut, BarChart2 } from "lucide-react";
 import NotificationDropdown from "./notificationDropdown";
 
 function AdminNavbar() {
@@ -45,11 +45,11 @@ function AdminNavbar() {
           </Link>
 
           <Link
-            to="/admin/history"
+            to="/admin/events-report"
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
           >
-            <ClipboardList size={20} />
-            <span>Event Reports</span>
+            <BarChart2 size={20} />
+            <span>Events Report</span>
           </Link>
 
           <Link
