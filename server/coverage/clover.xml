@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1740808154223" clover="3.2.0">
-  <project timestamp="1740808154223" name="All files">
-    <metrics statements="73" coveredstatements="70" conditionals="39" coveredconditionals="31" methods="7" coveredmethods="6" elements="119" coveredelements="107" complexity="0" loc="73" ncloc="73" packages="4" files="7" classes="7"/>
+<coverage generated="1740856673811" clover="3.2.0">
+  <project timestamp="1740856673811" name="All files">
+    <metrics statements="93" coveredstatements="85" conditionals="41" coveredconditionals="32" methods="15" coveredmethods="11" elements="149" coveredelements="128" complexity="0" loc="93" ncloc="93" packages="4" files="7" classes="7"/>
     <package name="server">
       <metrics statements="14" coveredstatements="13" conditionals="4" coveredconditionals="3" methods="1" coveredmethods="0"/>
-      <file name="server.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\server.js">
+      <file name="server.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/server.js">
         <metrics statements="14" coveredstatements="13" conditionals="4" coveredconditionals="3" methods="1" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -23,8 +23,8 @@
       </file>
     </package>
     <package name="server.controllers">
-      <metrics statements="21" coveredstatements="21" conditionals="10" coveredconditionals="5" methods="4" coveredmethods="4"/>
-      <file name="adminProfile.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\controllers\adminProfile.js">
+      <metrics statements="38" coveredstatements="33" conditionals="12" coveredconditionals="6" methods="12" coveredmethods="9"/>
+      <file name="adminProfile.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/controllers/adminProfile.js">
         <metrics statements="12" coveredstatements="12" conditionals="10" coveredconditionals="5" methods="2" coveredmethods="2"/>
         <line num="1" count="2" type="stmt"/>
         <line num="11" count="2" type="stmt"/>
@@ -39,22 +39,39 @@
         <line num="24" count="1" type="stmt"/>
         <line num="27" count="2" type="stmt"/>
       </file>
-      <file name="volunteerHistory.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\controllers\volunteerHistory.js">
-        <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <file name="volunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/controllers/volunteerHistory.js">
+        <metrics statements="26" coveredstatements="21" conditionals="2" coveredconditionals="1" methods="10" coveredmethods="7"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="26" count="2" type="stmt"/>
-        <line num="27" count="1" type="stmt"/>
-        <line num="30" count="2" type="stmt"/>
-        <line num="31" count="1" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
-        <line num="44" count="1" type="stmt"/>
-        <line num="45" count="1" type="stmt"/>
-        <line num="48" count="2" type="stmt"/>
+        <line num="37" count="2" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="43" count="2" type="stmt"/>
+        <line num="44" count="2" type="stmt"/>
+        <line num="57" count="2" type="stmt"/>
+        <line num="58" count="2" type="stmt"/>
+        <line num="62" count="2" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="71" count="2" type="stmt"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="73" count="6" type="stmt"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="83" count="2" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="86" count="4" type="stmt"/>
+        <line num="87" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="88" count="0" type="stmt"/>
+        <line num="91" count="1" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="98" count="1" type="stmt"/>
+        <line num="101" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.middleware">
       <metrics statements="24" coveredstatements="22" conditionals="25" coveredconditionals="23" methods="2" coveredmethods="2"/>
-      <file name="validateAdminProfile.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\middleware\validateAdminProfile.js">
+      <file name="validateAdminProfile.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/middleware/validateAdminProfile.js">
         <metrics statements="16" coveredstatements="15" conditionals="14" coveredconditionals="13" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -73,21 +90,21 @@
         <line num="25" count="1" type="stmt"/>
         <line num="28" count="2" type="stmt"/>
       </file>
-      <file name="validateVolunteerHistory.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\middleware\validateVolunteerHistory.js">
+      <file name="validateVolunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/middleware/validateVolunteerHistory.js">
         <metrics statements="8" coveredstatements="7" conditionals="11" coveredconditionals="10" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="2" count="2" type="stmt"/>
-        <line num="4" count="2" type="cond" truecount="9" falsecount="0"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="4" count="3" type="cond" truecount="9" falsecount="0"/>
         <line num="5" count="1" type="stmt"/>
-        <line num="8" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="2" type="cond" truecount="1" falsecount="1"/>
         <line num="9" count="0" type="stmt"/>
-        <line num="12" count="1" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
         <line num="15" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.routes">
-      <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="adminProfile.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\routes\adminProfile.js">
+      <metrics statements="17" coveredstatements="17" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="adminProfile.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/routes/adminProfile.js">
         <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -97,15 +114,18 @@
         <line num="9" count="2" type="stmt"/>
         <line num="11" count="2" type="stmt"/>
       </file>
-      <file name="volunteerHistory.js" path="C:\Users\gabyc\OneDrive\Documents\GitHub\4353-Group11-SP25\server\routes\volunteerHistory.js">
-        <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="volunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/routes/volunteerHistory.js">
+        <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
         <line num="3" count="2" type="stmt"/>
         <line num="5" count="2" type="stmt"/>
         <line num="8" count="2" type="stmt"/>
         <line num="11" count="2" type="stmt"/>
-        <line num="13" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
       </file>
     </package>
   </project>

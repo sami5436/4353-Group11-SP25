@@ -1,23 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import AdminNavbar from "../components/adminNavbar";
 
-const initialEventAssignments = {
-  "Community Cleanup": [
-    { id: "volunteer-1", name: "Sami Hamdalla" },
-    { id: "volunteer-2", name: "Yusuf Khan" },
-  ],
-  "Food Drive": [{ id: "volunteer-3", name: "lalalala" }],
-  "Animal Shelter Support": [],
-  "For Fun": [],
-  "Hey": [],
-  "New Event": [],
-};
-
 function DraggableItem({ id, name }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id,
-  });
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
 
   const style = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
@@ -59,7 +46,32 @@ function DroppableArea({ id, name, assignedVolunteers }) {
 }
 
 function AdminManageVolunteers() {
-  const [eventAssignments, setEventAssignments] = useState(initialEventAssignments);
+  const [volunteers, setVolunteers] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [eventAssignments, setEventAssignments] = useState({});
+
+  // Fetch Volunteers
+  useEffect(() => {
+    axios
+      .get("http://localhost:5001/api/volunteerHistory/volunteers")
+      .then((res) => setVolunteers(res.data))
+      .catch((err) => console.error("Error fetching Volunteers:", err));
+  }, []);
+
+  // Fetch Events and Initialize Assignments
+  useEffect(() => {
+    axios
+      .get("http://localhost:5001/api/volunteerHistory")
+      .then((res) => {
+        setEvents(res.data);
+        const assignments = res.data.reduce((acc, event) => {
+          acc[event.name] = event.volunteers || [];
+          return acc;
+        }, {});
+        setEventAssignments(assignments);
+      })
+      .catch((err) => console.error("Error fetching Events:", err));
+  }, []);
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -69,6 +81,7 @@ function AdminManageVolunteers() {
     let sourceEventId = null;
     let volunteer = null;
 
+    // Find source event
     for (const eventId in eventAssignments) {
       const volunteers = eventAssignments[eventId];
       const foundVolunteer = volunteers.find((v) => v.id === volunteerId);
@@ -84,14 +97,25 @@ function AdminManageVolunteers() {
     setEventAssignments((prev) => {
       const newAssignments = { ...prev };
 
+      // Remove from source
       newAssignments[sourceEventId] = newAssignments[sourceEventId].filter(
         (v) => v.id !== volunteerId
       );
 
+      // Add to target event
       newAssignments[over.id] = [...newAssignments[over.id], volunteer];
 
       return newAssignments;
     });
+
+    // Update backend with new volunteer assignment
+    axios
+      .post("http://localhost:5001/api/volunteerHistory/addVolunteer", {
+        eventId: events.find((e) => e.name === over.id)?.id,
+        volunteerName: volunteer.name,
+        volunteerEmail: volunteer.email
+      })
+      .catch((err) => console.error("Error updating volunteer assignment:", err));
   };
 
   return (
