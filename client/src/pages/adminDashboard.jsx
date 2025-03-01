@@ -8,6 +8,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("profile");
 
+
     const [profileData, setProfileData] = useState({
         fullName: "",
         adminId: "",
@@ -18,14 +19,12 @@ const AdminDashboard = () => {
         emergencyPhone: "",
     });
     const [isLoading, setIsLoading] = useState(true);
-    const [formValues, setFormValues] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         axios.get("http://localhost:5001/api/adminProfile")
             .then((res) => {
                 setProfileData(res.data);
-                setFormValues(res.data);
                 setIsLoading(false);
             })
             .catch((err) => {
@@ -34,17 +33,49 @@ const AdminDashboard = () => {
             });
     }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormValues({
-            ...formValues,
-            [name]: value
-        });
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrorMessage("");
+    
+        const formData = new FormData(e.target);
+        const formValues = Object.fromEntries(formData.entries());
+        
+        const errors = [];
+        
+        if (!formValues.fullName || formValues.fullName.trim() === "") {
+            errors.push("Full name is required");
+        }
+        
+        if (!formValues.email || formValues.email.trim() === "") {
+            errors.push("Email address is required");
+        }
+        else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formValues.email)) {
+                errors.push("Please enter a valid email address");
+            }
+        }
+        
+        if (!formValues.phone || formValues.phone.trim() === "") {
+            errors.push("Phone number is required");
+        } 
+        else {
+            const phoneRegex = /^\d{10}$|^\d{3}-\d{3}-\d{4}$/;
+            if (!phoneRegex.test(formValues.phone)) {
+                errors.push("Please enter a valid 10-digit phone number (e.g., 1234567890 or 123-456-7890)");
+            }
+        }
+        
+        if (errors.length > 0) {
+            setErrorMessage(errors.join(", "));
+            
+            setProfileData({
+                ...profileData,
+                ...formValues
+            });
+            
+            return;
+        }
         
         axios.put("http://localhost:5001/api/adminProfile", formValues)
             .then((res) => {
@@ -53,9 +84,16 @@ const AdminDashboard = () => {
             })
             .catch((err) => {
                 console.error("Error updating profile:", err);
+                
+                setProfileData({
+                    ...profileData,
+                    ...formValues
+                });
+                
                 if (err.response && err.response.data && err.response.data.errors) {
                     setErrorMessage(err.response.data.errors.join(", "));
-                } else {
+                } 
+                else {
                     setErrorMessage("Failed to update profile. Please try again.");
                 }
             });
@@ -88,7 +126,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="text" 
                                             name="position"
-                                            value={formValues.position || ""} 
+                                            defaultValue={profileData.position || ""} 
                                             readOnly 
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-200 text-gray-700 focus:outline-none" 
                                         />
@@ -98,8 +136,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="text" 
                                             name="fullName"
-                                            value={formValues.fullName || ""} 
-                                            onChange={handleInputChange}
+                                            defaultValue={profileData.fullName || ""}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" 
                                         />
                                     </div>
@@ -108,8 +145,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="email" 
                                             name="email"
-                                            value={formValues.email || ""} 
-                                            onChange={handleInputChange}
+                                            defaultValue={profileData.email || ""}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" 
                                         />
                                     </div>
@@ -118,8 +154,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="tel" 
                                             name="phone"
-                                            value={formValues.phone || ""} 
-                                            onChange={handleInputChange}
+                                            defaultValue={profileData.phone || ""}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" 
                                         />
                                     </div>
@@ -133,8 +168,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="text" 
                                             name="emergencyContact"
-                                            value={formValues.emergencyContact || ""} 
-                                            onChange={handleInputChange}
+                                            defaultValue={profileData.emergencyContact || ""}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" 
                                         />
                                     </div>
@@ -143,8 +177,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="tel" 
                                             name="emergencyPhone"
-                                            value={formValues.emergencyPhone || ""} 
-                                            onChange={handleInputChange}
+                                            defaultValue={profileData.emergencyPhone || ""}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" 
                                         />
                                     </div>
@@ -154,7 +187,7 @@ const AdminDashboard = () => {
                                 <button 
                                     type="button" 
                                     className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors hover:cursor-pointer"
-                                    onClick={() => setFormValues(profileData)}
+                                    onClick={() => navigate(0)}
                                 >
                                     Cancel
                                 </button>
