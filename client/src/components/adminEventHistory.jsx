@@ -139,7 +139,7 @@ const EventHistory = () => {
 
       // If creating a new event
       if (isCreating) {
-        const response = await fetch(`${API_BASE_URL}/volunteerHistory`, {
+        const response = await fetch(`${API_BASE_URL}/events`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const EventHistory = () => {
         fetchEvents();
       } else {
         // Update existing event
-        const response = await fetch(`${API_BASE_URL}/volunteerHistory/${editedEvent.id}`, {
+        const response = await fetch(`${API_BASE_URL}/events/${editedEvent.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ const EventHistory = () => {
   // For adding volunteers to events
   const addVolunteerToEvent = async (eventId, volunteerName, volunteerEmail) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/volunteerHistory/addVolunteer`, {
+      const response = await fetch(`${API_BASE_URL}/events/addVolunteer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

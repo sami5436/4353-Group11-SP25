@@ -9,22 +9,19 @@ const {
   updateEvent  
 } = require('../controllers/eventsController');
 
-// GET all volunteer history events
+// GET all events to match frontend request
+router.get('/', getVolunteerHistory);
+
+// Add route for volunteerHistory POST and PUT requests
+router.post('/volunteerHistory', addEvent);
+router.put('/volunteerHistory/:id', updateEvent);
+
+// Keep existing routes
 router.get('/history', getVolunteerHistory);
-
-// POST a new event
 router.post('/', addEvent);
-
-// GET upcoming events names only
 router.get('/upcoming', getEvents);
-
-// GET all volunteers across all events
 router.get('/volunteers', getVolunteers);
-
-// POST add a volunteer to an event
 router.post('/addVolunteer', addVolunteerToEvent);
-
-// PUT update an existing event (new endpoint)
 router.put('/:id', updateEvent);
 
 module.exports = router;
