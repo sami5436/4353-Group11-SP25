@@ -1,51 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminNavbar from '../components/adminNavbar';
 import { Check } from 'lucide-react';
+import axios from 'axios';
 
 const AdminNotifications = () => {
-    const [notifications, setNotifications] = useState([
-        {
-            id: 1,
-            type: 'volunteer_signup',
-            message: 'New volunteer signup: Jane Smith',
-            timestamp: '2025-02-07T10:00:00',
-            read: false,
-            details: 'Contact: jane.smith@gmail.com'
-        },
-        {
-            id: 2,
-            type: 'event_update',
-            message: 'Event "Charity Gala" has been modified',
-            timestamp: '2025-01-24T15:00:00',
-            read: false,
-            details: 'New date approved'
-        },
-        {
-            id: 3,
-            type: 'event_creation',
-            message: 'Event "Toy Drive" has been created',
-            timestamp: '2025-01-24T17:00:00',
-            read: false,
-            details: 'Admin John Doe has initiated the creation'
-        }
-    ]);
-
+    const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState('all');
 
-    const filteredNotifications = notifications.filter(notif => {
-        if (filter === 'all') return true;
-        if (filter === 'unread') return !notif.read;
-        return notif.type === filter;
-    });
+    useEffect(() => {
+        let url = 'http://localhost:5001/api/notifications?userRole=admin';
+        if (filter === 'unread') {
+          url += '&unread=true';
+        } else if (filter !== 'all') {
+          url += `&type=${filter}`;
+        }
+        
+        axios.get(url)
+          .then(res => setNotifications(res.data))
+          .catch(err => console.error("Error fetching notifications:", err));
+    }, [filter]);
+      
 
     const markAllAsRead = () => {
-        setNotifications(notifications.map(notif => ({ ...notif, read:true })));
+        axios.put('http://localhost:5001/api/notifications/markAllRead?userRole=admin')
+            .then(res => {
+            if (res.data.success) {
+                setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+            }
+            })
+            .catch(err => console.error("Error marking all notifications as read:", err));
     };
 
     const markAsRead = (id) => {
-        setNotifications(notifications.map(notif => 
-            notif.id === id ? { ...notif, read: true } : notif
-        ));
+        axios.put(`http://localhost:5001/api/notifications/${id}/read`)
+            .then(res => {
+            setNotifications(notifications.map(notif =>
+                notif.id === id ? { ...notif, read: true } : notif
+            ));
+            })
+            .catch(err => console.error("Error marking notification as read:", err));
     };
 
     const formatFilterLabel = (filterType) => {
@@ -103,38 +96,44 @@ const AdminNotifications = () => {
                     </div>
 
                     <div className="divide-y divide-gray-200">
-                        {filteredNotifications.map(notification => (
-                            <div
-                                key={notification.id}
-                                className={`p-6 ${!notification.read ? 'bg-emerald-50' : ''}`}
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-900">
-                                            {notification.message}
-                                        </p>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            {notification.details}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <span className="text-sm text-gray-500">
-                                            {new Date(notification.timestamp).toLocaleString()}
-                                        </span>
-                                        {!notification.read && (
-                                                <button
-                                                    onClick={() => markAsRead(notification.id)}
-                                                    className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
-                                                    title="Mark as read"
-                                                >
-                                                    <Check className="w-5 h-5 text-emerald-600" />
-                                                </button>
-                                        )}
+                        {notifications.length > 0 ? (
+                            notifications.map(notification => (
+                                <div
+                                    key={notification.id}
+                                    className={`p-6 ${!notification.read ? 'bg-emerald-50' : ''}`}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">
+                                                {notification.message}
+                                            </p>
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                {notification.details}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center space-x-4">
+                                            <span className="text-sm text-gray-500">
+                                                {new Date(notification.timestamp).toLocaleString()}
+                                            </span>
+                                            {!notification.read && (
+                                                    <button
+                                                        onClick={() => markAsRead(notification.id)}
+                                                        className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
+                                                        title="Mark as read"
+                                                    >
+                                                        <Check className="w-5 h-5 text-emerald-600" />
+                                                    </button>
+                                            )}
 
+                                        </div>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="p-6 text-center text-gray-500">
+                                No notifications to display
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>
