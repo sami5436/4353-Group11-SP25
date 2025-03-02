@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1740856673811" clover="3.2.0">
-  <project timestamp="1740856673811" name="All files">
-    <metrics statements="93" coveredstatements="85" conditionals="41" coveredconditionals="32" methods="15" coveredmethods="11" elements="149" coveredelements="128" complexity="0" loc="93" ncloc="93" packages="4" files="7" classes="7"/>
+<coverage generated="1740954163190" clover="3.2.0">
+  <project timestamp="1740954163190" name="All files">
+    <metrics statements="97" coveredstatements="91" conditionals="65" coveredconditionals="55" methods="16" coveredmethods="12" elements="178" coveredelements="158" complexity="0" loc="97" ncloc="97" packages="4" files="6" classes="6"/>
     <package name="server">
       <metrics statements="14" coveredstatements="13" conditionals="4" coveredconditionals="3" methods="1" coveredmethods="0"/>
       <file name="server.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/server.js">
@@ -12,18 +12,18 @@
         <line num="4" count="2" type="stmt"/>
         <line num="5" count="2" type="stmt"/>
         <line num="7" count="2" type="stmt"/>
-        <line num="10" count="2" type="stmt"/>
-        <line num="12" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
         <line num="14" count="2" type="stmt"/>
-        <line num="15" count="2" type="stmt"/>
-        <line num="17" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="19" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="23" count="2" type="stmt"/>
+        <line num="16" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="18" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.controllers">
-      <metrics statements="38" coveredstatements="33" conditionals="12" coveredconditionals="6" methods="12" coveredmethods="9"/>
+      <metrics statements="50" coveredstatements="46" conditionals="47" coveredconditionals="39" methods="14" coveredmethods="11"/>
       <file name="adminProfile.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/controllers/adminProfile.js">
         <metrics statements="12" coveredstatements="12" conditionals="10" coveredconditionals="5" methods="2" coveredmethods="2"/>
         <line num="1" count="2" type="stmt"/>
@@ -39,38 +39,50 @@
         <line num="24" count="1" type="stmt"/>
         <line num="27" count="2" type="stmt"/>
       </file>
-      <file name="volunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/controllers/volunteerHistory.js">
-        <metrics statements="26" coveredstatements="21" conditionals="2" coveredconditionals="1" methods="10" coveredmethods="7"/>
+      <file name="eventsController.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/controllers/eventsController.js">
+        <metrics statements="38" coveredstatements="34" conditionals="37" coveredconditionals="34" methods="12" coveredmethods="9"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="37" count="2" type="stmt"/>
-        <line num="38" count="1" type="stmt"/>
-        <line num="42" count="2" type="stmt"/>
-        <line num="43" count="2" type="stmt"/>
         <line num="44" count="2" type="stmt"/>
-        <line num="57" count="2" type="stmt"/>
-        <line num="58" count="2" type="stmt"/>
-        <line num="62" count="2" type="stmt"/>
-        <line num="63" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="65" count="0" type="stmt"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="71" count="2" type="stmt"/>
-        <line num="72" count="1" type="stmt"/>
-        <line num="73" count="6" type="stmt"/>
-        <line num="79" count="1" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="49" count="2" type="stmt"/>
+        <line num="50" count="4" type="stmt"/>
+        <line num="52" count="4" type="cond" truecount="9" falsecount="0"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="56" count="3" type="stmt"/>
+        <line num="70" count="3" type="stmt"/>
+        <line num="71" count="3" type="stmt"/>
+        <line num="75" count="2" type="stmt"/>
+        <line num="76" count="3" type="stmt"/>
+        <line num="77" count="15" type="stmt"/>
+        <line num="79" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="80" count="1" type="stmt"/>
         <line num="83" count="2" type="stmt"/>
-        <line num="84" count="1" type="stmt"/>
-        <line num="86" count="4" type="stmt"/>
-        <line num="87" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="91" count="1" type="stmt"/>
-        <line num="97" count="1" type="stmt"/>
-        <line num="98" count="1" type="stmt"/>
-        <line num="101" count="2" type="stmt"/>
+        <line num="85" count="2" type="cond" truecount="4" falsecount="0"/>
+        <line num="86" count="1" type="stmt"/>
+        <line num="89" count="1" type="stmt"/>
+        <line num="101" count="1" type="stmt"/>
+        <line num="105" count="2" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="108" count="0" type="stmt"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="115" count="2" type="stmt"/>
+        <line num="116" count="1" type="stmt"/>
+        <line num="117" count="6" type="stmt"/>
+        <line num="123" count="1" type="stmt"/>
+        <line num="127" count="2" type="stmt"/>
+        <line num="128" count="2" type="stmt"/>
+        <line num="130" count="9" type="stmt"/>
+        <line num="131" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="132" count="1" type="stmt"/>
+        <line num="135" count="1" type="stmt"/>
+        <line num="141" count="1" type="stmt"/>
+        <line num="142" count="1" type="stmt"/>
+        <line num="148" count="2" type="stmt"/>
       </file>
     </package>
     <package name="server.middleware">
-      <metrics statements="24" coveredstatements="22" conditionals="25" coveredconditionals="23" methods="2" coveredmethods="2"/>
+      <metrics statements="16" coveredstatements="15" conditionals="14" coveredconditionals="13" methods="1" coveredmethods="1"/>
       <file name="validateAdminProfile.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/middleware/validateAdminProfile.js">
         <metrics statements="16" coveredstatements="15" conditionals="14" coveredconditionals="13" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
@@ -90,17 +102,6 @@
         <line num="25" count="1" type="stmt"/>
         <line num="28" count="2" type="stmt"/>
       </file>
-      <file name="validateVolunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/middleware/validateVolunteerHistory.js">
-        <metrics statements="8" coveredstatements="7" conditionals="11" coveredconditionals="10" methods="1" coveredmethods="1"/>
-        <line num="1" count="2" type="stmt"/>
-        <line num="2" count="3" type="stmt"/>
-        <line num="4" count="3" type="cond" truecount="9" falsecount="0"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="8" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="12" count="2" type="stmt"/>
-        <line num="15" count="2" type="stmt"/>
-      </file>
     </package>
     <package name="server.routes">
       <metrics statements="17" coveredstatements="17" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -114,18 +115,18 @@
         <line num="9" count="2" type="stmt"/>
         <line num="11" count="2" type="stmt"/>
       </file>
-      <file name="volunteerHistory.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/routes/volunteerHistory.js">
+      <file name="eventsRoutes.js" path="/Users/samihamdalla/Desktop/swd_sp25/server/routes/eventsRoutes.js">
         <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="5" count="2" type="stmt"/>
-        <line num="8" count="2" type="stmt"/>
-        <line num="11" count="2" type="stmt"/>
-        <line num="14" count="2" type="stmt"/>
-        <line num="17" count="2" type="stmt"/>
-        <line num="20" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="16" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
         <line num="22" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="28" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
       </file>
     </package>
   </project>

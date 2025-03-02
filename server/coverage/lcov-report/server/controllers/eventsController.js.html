@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for server/controllers/volunteerHistory.js</title>
+    <title>Code coverage report for server/controllers/eventsController.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,7 +19,7 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/controllers</a> volunteerHistory.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/controllers</a> eventsController.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
@@ -214,7 +214,10 @@
 <a name='L149'></a><a href='#L149'>149</a>
 <a name='L150'></a><a href='#L150'>150</a>
 <a name='L151'></a><a href='#L151'>151</a>
-<a name='L152'></a><a href='#L152'>152</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -259,6 +262,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -297,7 +301,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -318,13 +321,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -356,6 +359,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -407,11 +413,12 @@
 &nbsp;
 &nbsp;
 &nbsp;
-&nbsp;
+// gather current volunteer history (mainly events) in volunteer profile
 const getVolunteerHistory = (req, res) =&gt; {
   res.json(events);
 };
 &nbsp;
+// used in manage events page
 const addEvent = (req, res) =&gt; {
   const { name, date, city, state, address, status, description, volunteered, skills } = req.body;
 &nbsp;
@@ -437,7 +444,7 @@ const addEvent = (req, res) =&gt; {
   res.status(201).json(newEvent);
 };
 &nbsp;
-&nbsp;
+// used in manage events page
 const updateEvent = (req, res) =&gt; {
   const eventId = parseInt(req.params.id);
   const eventIndex = events.findIndex(event =&gt; event.id === eventId);
@@ -448,7 +455,6 @@ const updateEvent = (req, res) =&gt; {
 &nbsp;
   const { name, date, city, state, address, status, description, skills } = req.body;
 &nbsp;
-  // Ensure that fields are valid (status should be a string, for example)
   if (status &amp;&amp; typeof status !== "string") {
     return res.status(400).json({ message: "Invalid status format" });
   }
@@ -468,8 +474,7 @@ const updateEvent = (req, res) =&gt; {
   res.json(events[eventIndex]);
 };
 &nbsp;
-&nbsp;
-// Get upcoming events only
+// used in manage events page
 const getEvents = <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
   const upcomingEventNames = <span class="cstat-no" title="statement not covered" >events</span>
     .filter(<span class="fstat-no" title="function not covered" >ev</span>ent =&gt; <span class="cstat-no" title="statement not covered" >event.status.toLowerCase() === "upcoming")</span>
@@ -478,7 +483,8 @@ const getEvents = <span class="fstat-no" title="function not covered" >(r</span>
 <span class="cstat-no" title="statement not covered" >  res.json(upcomingEventNames);</span>
 };
 &nbsp;
-// Get all volunteers from all events
+&nbsp;
+// used in drag and drop thingy page
 const getVolunteers = (req, res) =&gt; {
   let allVolunteers = events.flatMap(event =&gt;
     event.volunteers.map(volunteer =&gt; ({
@@ -490,7 +496,7 @@ const getVolunteers = (req, res) =&gt; {
   res.json(allVolunteers);
 };
 &nbsp;
-// Add a volunteer to an event
+// used in drag and drop thingy page
 const addVolunteerToEvent = (req, res) =&gt; {
   const { eventId, volunteerName, volunteerEmail } = req.body;
       
@@ -509,6 +515,9 @@ const addVolunteerToEvent = (req, res) =&gt; {
   res.status(201).json(newVolunteer);
 };
 &nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
 module.exports = {
   getVolunteerHistory,
   addEvent,
@@ -523,7 +532,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-02T21:55:41.940Z
+                at 2025-03-02T22:22:43.182Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

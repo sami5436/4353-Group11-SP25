@@ -8,7 +8,7 @@ function History() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5001/api/volunteerHistory")
+    axios.get("http://localhost:5001/api/events/history")
       .then((res) => setEvents(res.data))
       .catch((err) => console.error("Error fetching volunteerHistory:", err));
   }, []);

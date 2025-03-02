@@ -53,7 +53,7 @@ function AdminManageVolunteers() {
   // Fetch Volunteers
   useEffect(() => {
     axios
-      .get("http://localhost:5001/api/volunteerHistory/volunteers")
+      .get("http://localhost:5001/api/events/volunteers")
       .then((res) => setVolunteers(res.data))
       .catch((err) => console.error("Error fetching Volunteers:", err));
   }, []);
@@ -61,7 +61,7 @@ function AdminManageVolunteers() {
   // Fetch Events and Initialize Assignments
   useEffect(() => {
     axios
-      .get("http://localhost:5001/api/volunteerHistory")
+      .get("http://localhost:5001/api/events")
       .then((res) => {
         setEvents(res.data);
         const assignments = res.data.reduce((acc, event) => {
@@ -110,7 +110,7 @@ function AdminManageVolunteers() {
 
     // Update backend with new volunteer assignment
     axios
-      .post("http://localhost:5001/api/volunteerHistory/addVolunteer", {
+      .post("http://localhost:5001/api/events/addVolunteer", {
         eventId: events.find((e) => e.name === over.id)?.id,
         volunteerName: volunteer.name,
         volunteerEmail: volunteer.email
