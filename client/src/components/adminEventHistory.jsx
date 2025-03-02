@@ -423,7 +423,7 @@ const EventHistory = () => {
                                 input.value.trim(),
                               ]);
                             }
-                            input.value = "";
+                            input.value = '';
                           }
                         }}
                         className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
@@ -471,6 +471,55 @@ const EventHistory = () => {
                       </div>
                     ))}
                   </div>
+                  
+                  {editedEvent.skills.length > 0 && (
+                    <div className="mt-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Selected Skills</span>
+                        <button
+                          onClick={() => handleEventChange("skills", [])}
+                          className="text-xs text-gray-600 hover:text-gray-900 cursor-pointer"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {editedEvent.skills.map((skill) => (
+                          <div 
+                            key={skill} 
+                            className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-emerald-100 text-emerald-800 rounded-md"
+                          >
+                            <span>{skill}</span>
+                            <button
+                              onClick={() => {
+                                const updatedSkills = editedEvent.skills.filter(
+                                  (s) => s !== skill
+                                );
+                                handleEventChange("skills", updatedSkills);
+                              }}
+                              className="text-emerald-600 hover:text-emerald-800"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {errors.skills && (
                     <p className="text-red-500 text-sm">{errors.skills}</p>
                   )}
