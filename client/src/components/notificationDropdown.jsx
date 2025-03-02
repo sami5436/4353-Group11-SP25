@@ -1,46 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 
 const NotificationDropdown = ({ userRole = 'volunteer' }) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState([
-        {
-            id: 1,
-            type: userRole === 'admin' ? 'volunteer_signup' : 'event_reminder',
-            message: userRole === 'admin' 
-                ? 'New volunteer signup: Jane Smith'
-                : 'Upcoming Event: Charity Gala tomorrow',
-            timestamp: '2025-02-07T10:00:00',
-            read: false
-        },
-        {
-            id: 2,
-            type: userRole === 'admin' ? 'event_update' : 'schedule_change',
-            message: userRole === 'admin'
-                ? 'Event "Charity Gala" has been modified'
-                : 'Your volunteer shift has been updated',
-            timestamp: '2025-01-24T15:00:00',
-            read: false
-        },
-        {
-            id: 3,
-            type: userRole === 'admin' ? 'event_creation' : 'new_event',
-            message: userRole === 'admin'
-                ? 'Event "Toy Drive" has been created'
-                : 'New volunteer opportunity available',
-            timestamp: '2025-01-08T17:00:00',
-            read: false
-        }
-    ]);
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        axios.get(`http://localhost:5001/api/notifications?userRole=${userRole}&unread=true`)
+            .then((res) => setNotifications(res.data))
+            .catch((err) => console.error("Error fetching notifications:", err));
+    }, [userRole]);
 
     const unreadCount = notifications.filter(notif => !notif.read).length;
 
     const markAsRead = (id) => {
-        setNotifications(notifications.map(notif =>
-            notif.id === id ? { ...notif, read:true } : notif
-        ));
+        axios.put(`http://localhost:5001/api/notifications/${id}/read`)
+            .then(() => {
+                setNotifications(notifications.map(notif =>
+                    notif.id === id ? { ...notif, read: true } : notif
+                ));
+            })
+            .catch((err) => console.error("Error marking notification as read:", err));
     };
 
     const formatTime = (timestamp) => {
