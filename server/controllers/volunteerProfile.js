@@ -1,30 +1,33 @@
-let userProfile = {
+let volunteerProfile = {
   firstName: "Joe",
   lastName: "Biden",
   address1: "1600 Pennsylvania Avenue",
-  address2: "",
   city1: "Washington",
   state1: "DC",
   zipCode1: "20500",
+  address2: "",
+  city2: "",
+  state2: "",
+  zipCode2: "",
   skills: [],
   preferences: "",
   availability: ""
 };
 
-const getUserProfile = (req, res) => {
-  res.json(userProfile);
+const getVolunteerProfile = (req, res) => {
+  res.json(volunteerProfile);
 };
 
-const updateUserProfile = (req, res) => {
+const updateVolunteerProfile = (req, res) => {
   const { firstName, lastName, address1, address2, city1, state1, zipCode1, skills, preferences, availability } = req.body;
 
   // Update the user profile with the new data
-  userProfile = { firstName, lastName, address1, address2, city1, state1, zipCode1, skills, preferences, availability };
+  volunteerProfile = { firstName, lastName, address1, address2, city1, state1, zipCode1, skills, preferences, availability };
   
-  res.status(200).json({ message: "Profile updated successfully", userProfile });
+  res.status(200).json({ message: "Profile updated successfully", volunteerProfile });
 };
 
 module.exports = {
-  getUserProfile,
-  updateUserProfile
+  getVolunteerProfile,
+  updateVolunteerProfile
 };

@@ -1,4 +1,4 @@
-const validateUserProfile = (req, res, next) => {
+const validateVolunteerProfile = (req, res, next) => {
   const { firstName, lastName, address1, city1, state1, zipCode1 } = req.body;
   const errors = [];
 
@@ -15,4 +15,4 @@ const validateUserProfile = (req, res, next) => {
   next();
 };
 
-module.exports = validateUserProfile;
+module.exports = validateVolunteerProfile;

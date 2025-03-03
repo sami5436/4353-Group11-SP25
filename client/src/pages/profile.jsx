@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
-import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 function Profile() {
@@ -142,7 +141,7 @@ function Profile() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name test*
+                  Last Name *
                 </label>
                 <input
                   type="text"
