@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.use("/api/volunteerHistory", eventRoutes);
 app.use("/api/adminProfile", adminProfileRoutes);
-app.use("/api/userProfile", userVolunteerRoutes);
+app.use("/api/volunteerProfile", userVolunteerRoutes);
 
 const PORT = process.env.PORT || 5001;
 
