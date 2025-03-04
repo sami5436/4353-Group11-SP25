@@ -4,6 +4,8 @@ const cors = require("cors");
 const eventRoutes = require("./routes/eventsRoutes");
 const adminProfileRoutes = require("./routes/adminProfile");
 const notificationRoutes = require("./routes/notifications");
+const volunteerAssignmentsRoutes = require("./routes/volunteerAssignmentsRoutes");
+
 const userVolunteerRoutes = require("./routes/volunteerProfile");
 const app = express();
 
@@ -15,6 +17,8 @@ app.use(express.json());
 app.use("/api/events", eventRoutes);
 app.use("/api/adminProfile", adminProfileRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/volunteerAssignments", volunteerAssignmentsRoutes);
+
 app.use("/api/volunteerProfile", userVolunteerRoutes);
 
 const PORT = process.env.PORT || 5001;
