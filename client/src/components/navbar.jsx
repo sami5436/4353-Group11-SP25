@@ -17,12 +17,12 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="about-us" className="text-[#F8F9FA] hover:text-emerald-300">
+              <Link to="/about-us" className="text-[#F8F9FA] hover:text-emerald-300">
                 About Us
               </Link>
             </li>
             <li>
-              <Link to="contact-us" className="text-[#F8F9FA] hover:text-emerald-300">
+              <Link to="/contact-us" className="text-[#F8F9FA] hover:text-emerald-300">
                 Contact Us
               </Link>
             </li>

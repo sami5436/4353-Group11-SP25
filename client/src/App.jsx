@@ -12,6 +12,8 @@ import EventHistory from "./components/adminEventHistory";
 import VolunteerAssignments from "./pages/volunteerAssignments";
 import AdminManageVolunteers from "./pages/adminManageVolunteers";
 import AdminEventsReport from "./pages/adminEventsReport";
+import Contactus from "./pages/contactus";
+import Aboutus from "./pages/aboutus";
 
 function App() {
   const location = useLocation();
@@ -36,6 +38,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="signup" element={<Signup />} />
         <Route path="login" element={<Login />} />
+        <Route path="contact-us" element={<Contactus />} />
+        <Route path="about-us" element={<Aboutus />} />
         <Route path="volunteer/profile" element={<Profile />} />
         <Route path="admin/profile" element={<AdminDashboard />} />
         <Route path="volunteer/history" element={<History />} />
