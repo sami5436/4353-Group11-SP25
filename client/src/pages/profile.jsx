@@ -2,20 +2,21 @@ import React, { useState } from "react";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
 import CreatableSelect from 'react-select/creatable';
+import axios from "axios";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [showAddress2, setShowAddress2] = useState(false);
   const [profileData, setProfileData] = useState({
-    firstName: "Joe",
-    lastName: "Biden",
-    address1: "1600 Pennsylvania Avenue",
+    firstName: "",
+    lastName: "",
+    address1: "",
+    city1: "",
+    state1: "",
+    zipCode1: "",
     address2: "",
-    city1: "Washington",
     city2: "",
-    state1: "DC",
     state2: "",
-    zipCode1: "20500",
     zipCode2: "",
     skills: [],
     preferences: "",
