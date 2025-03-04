@@ -1,27 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 
-const assignedEvents = [
-  {
-    id: 1,
-    name: "Community Cleanup",
-    date: "2024-01-10",
-    location: "Houston, TX",
-  },
-  { id: 2, name: "Food Drive", date: "2024-03-15", location: "Austin, TX" },
-  {
-    id: 3,
-    name: "Animal Shelter Support",
-    date: "2024-05-20",
-    location: "Dallas, TX",
-  },
-];
-
-function volunteerAssignments() {
+function VolunteerAssignments() {
   const [isOpen, setIsOpen] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
+  const [assignedEvents, setAssignedEvents] = useState([]);
+  const volunteerId = "volunteer-1"; // Set the volunteer ID dynamically based on login
+
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get(`http://localhost:5001/api/volunteerAssignments?volunteerId=${volunteerId}`)
+        .then((response) => {
+          setAssignedEvents(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching assigned events:", error);
+        });
+    }
+  }, [isOpen]);
 
   const handleClick = () => {
     setIsOpen(true);
@@ -31,11 +31,9 @@ function volunteerAssignments() {
   return (
     <div className="flex min-h-screen overflow-hidden">
       <h2 className="text-3xl ml-76 mt-12 font-semibold">Find Your Assigned Events!</h2>
-      {/* <h2 className="ml-76 mt-12 font-semibold">Click on the</h2> */}
       <VolunteerNavbar />
 
       <div className="flex h-[calc(100vh-4rem)]">
-
         <div className="flex-1 p-10 flex flex-col relative">
           <div className="flex justify-center items-end h-full pb-20 relative">
             {showEvents && (
@@ -59,20 +57,24 @@ function volunteerAssignments() {
                 </div>
 
                 <ul className="space-y-3">
-                  {assignedEvents.map((event, index) => (
-                    <motion.li
-                      key={event.id}
-                      className="p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.2 }}
-                    >
-                      <p className="font-semibold">{event.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {event.date} - {event.location}
-                      </p>
-                    </motion.li>
-                  ))}
+                  {assignedEvents.length > 0 ? (
+                    assignedEvents.map((event, index) => (
+                      <motion.li
+                        key={event.id}
+                        className="p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.2 }}
+                      >
+                        <p className="font-semibold">{event.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {event.date} - {event.city}, {event.state}
+                        </p>
+                      </motion.li>
+                    ))
+                  ) : (
+                    <p className="text-gray-600">No assigned events found.</p>
+                  )}
                 </ul>
               </motion.div>
             )}
@@ -130,4 +132,4 @@ function volunteerAssignments() {
   );
 }
 
-export default volunteerAssignments;
+export default VolunteerAssignments;
