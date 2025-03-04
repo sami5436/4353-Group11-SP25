@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
 import CreatableSelect from 'react-select/creatable';
@@ -7,7 +7,8 @@ import axios from "axios";
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [showAddress2, setShowAddress2] = useState(false);
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState(null);
+  const [editedData, setEditedData] = useState({
     firstName: "",
     lastName: "",
     address1: "",
@@ -22,8 +23,6 @@ function Profile() {
     preferences: "",
     availability: ""
   });
-
-  const [editedData, setEditedData] = useState(profileData);
 
   const states = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA",
@@ -65,9 +64,22 @@ function Profile() {
     label: skill
   }));
 
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/volunteerProfile");
+        setProfileData(response.data);
+        setEditedData(response.data);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedData(profileData);
   };
 
   const handleCancel = () => {
@@ -75,17 +87,20 @@ function Profile() {
     setEditedData(profileData);
   };
 
-  const handleSave = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedData({ ...editedData, [name]: value });
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    
-    // If Address 2 section is shown, validate all its fields
-    if (showAddress2 && (!editedData.address2 || !editedData.city2 || !editedData.state2 || !editedData.zipCode2)) {
-      alert("Please fill out all fields for Address 2 or remove the second address section");
-      return;
+    try {
+      const response = await axios.put("http://localhost:5001/api/volunteerProfile", editedData);
+      setProfileData(response.data.volunteerProfile);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile data:", error);
     }
-    
-    setProfileData(editedData);
-    setIsEditing(false);
   };
 
   const handleRemoveAddress2 = () => {
@@ -98,6 +113,10 @@ function Profile() {
       zipCode2: ""
     });
   };
+
+  if (!profileData) {
+    return <div>Loading...</div>; // Show loading state while fetching data
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -131,8 +150,9 @@ function Profile() {
                 </label>
                 <input
                   type="text"
+                  name="firstName"
                   value={isEditing ? editedData.firstName : profileData.firstName}
-                  onChange={(e) => setEditedData({...editedData, firstName: e.target.value})}
+                  onChange={handleChange}
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -146,8 +166,9 @@ function Profile() {
                 </label>
                 <input
                   type="text"
+                  name="lastName"
                   value={isEditing ? editedData.lastName : profileData.lastName}
-                  onChange={(e) => setEditedData({...editedData, lastName: e.target.value})}
+                  onChange={handleChange}
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -162,8 +183,9 @@ function Profile() {
               </label>
               <input
                 type="text"
+                name="address1"
                 value={isEditing ? editedData.address1 : profileData.address1}
-                onChange={(e) => setEditedData({...editedData, address1: e.target.value})}
+                onChange={handleChange}
                 disabled={!isEditing}
                 required
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -178,8 +200,9 @@ function Profile() {
                 </label>
                 <input
                   type="text"
+                  name="city1"
                   value={isEditing ? editedData.city1 : profileData.city1}
-                  onChange={(e) => setEditedData({...editedData, city1: e.target.value})}
+                  onChange={handleChange}
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -192,8 +215,9 @@ function Profile() {
                   State *
                 </label>
                 <select
+                  name="state1"
                   value={isEditing ? editedData.state1 : profileData.state1}
-                  onChange={(e) => setEditedData({...editedData, state1: e.target.value})}
+                  onChange={handleChange}
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -212,8 +236,9 @@ function Profile() {
                 </label>
                 <input
                   type="text"
+                  name="zipCode1"
                   value={isEditing ? editedData.zipCode1 : profileData.zipCode1}
-                  onChange={(e) => setEditedData({...editedData, zipCode1: e.target.value})}
+                  onChange={handleChange}
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -255,8 +280,9 @@ function Profile() {
                   </label>
                   <input
                     type="text"
+                    name="address2"
                     value={isEditing ? editedData.address2 : profileData.address2}
-                    onChange={(e) => setEditedData({...editedData, address2: e.target.value})}
+                    onChange={handleChange}
                     disabled={!isEditing}
                     required
                     className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -271,8 +297,9 @@ function Profile() {
                     </label>
                     <input
                       type="text"
+                      name="city2"
                       value={isEditing ? editedData.city2 : profileData.city2}
-                      onChange={(e) => setEditedData({...editedData, city2: e.target.value})}
+                      onChange={handleChange}
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -285,8 +312,9 @@ function Profile() {
                       State *
                     </label>
                     <select
+                      name="state2"
                       value={isEditing ? editedData.state2 : profileData.state2}
-                      onChange={(e) => setEditedData({...editedData, state2: e.target.value})}
+                      onChange={handleChange}
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -305,8 +333,9 @@ function Profile() {
                     </label>
                     <input
                       type="text"
+                      name="zipCode2"
                       value={isEditing ? editedData.zipCode2 : profileData.zipCode2}
-                      onChange={(e) => setEditedData({...editedData, zipCode2: e.target.value})}
+                      onChange={handleChange}
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
@@ -356,8 +385,9 @@ function Profile() {
                 Preferences
               </label>
               <textarea
+                name="preferences"
                 value={isEditing ? editedData.preferences : profileData.preferences}
-                onChange={(e) => setEditedData({...editedData, preferences: e.target.value})}
+                onChange={handleChange}
                 disabled={!isEditing}
                 placeholder="Enter any specific preferences or notes..."
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 h-32
@@ -371,8 +401,9 @@ function Profile() {
               </label>
               <input
                 type="date"
+                name="availability"
                 value={isEditing ? editedData.availability : profileData.availability}
-                onChange={(e) => setEditedData({...editedData, availability: e.target.value})}
+                onChange={handleChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
                   ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
