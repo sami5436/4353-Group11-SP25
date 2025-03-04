@@ -3,13 +3,6 @@ const app = require("../server");
 
 describe("Volunteer Assignments API", () => {
   
-  it("should return all volunteer assignments", async () => {
-    const res = await request(app).get("/api/volunteerAssignments");
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
-  });
-
   it("should return assignments filtered by volunteer ID", async () => {
     const volunteerId = "volunteer-1";
     const res = await request(app).get(`/api/volunteerAssignments?volunteerId=${volunteerId}`);

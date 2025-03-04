@@ -46,7 +46,9 @@ let events = [
     const assignedEvents = events.filter((event) =>
       event.volunteers.some((volunteer) => volunteer.id === volunteerId)
     );
-  
+    if (assignedEvents.length === 0) {
+        return res.status(404).json({ error: "No events found for this volunteer." });
+    }
     res.json(assignedEvents);
   };
   
