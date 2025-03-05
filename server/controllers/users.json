@@ -1,0 +1,38 @@
+{
+  "user1": {
+    "id": 1,
+    "email": "yuusf@gmail.com",
+    "password": "Mynameisyusuf1",
+    "role": "admin"
+  },
+  "user2": {
+    "id": 2,
+    "email": "john.doe@example.com",
+    "password": "JohnDoe123!",
+    "role": "user"
+  },
+  "user3": {
+    "id": 3,
+    "email": "newuser@example.com",
+    "password": "Newuser123",
+    "role": "user"
+  },
+  "user4": {
+    "id": 4,
+    "email": "newuser2@gmail.com",
+    "password": "Newuser222",
+    "role": "user"
+  },
+  "user5": {
+    "id": 5,
+    "email": "hehe@gmail.com",
+    "password": "Hehe1234",
+    "role": "user"
+  },
+  "user6": {
+    "id": 6,
+    "email": "f@gmail.com",
+    "password": "1234567Ay",
+    "role": "user"
+  }
+}
