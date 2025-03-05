@@ -18,7 +18,6 @@ app.use("/api/events", eventRoutes);
 app.use("/api/adminProfile", adminProfileRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/volunteerAssignments", volunteerAssignmentsRoutes);
-
 app.use("/api/volunteerProfile", userVolunteerRoutes);
 
 const PORT = process.env.PORT || 5001;

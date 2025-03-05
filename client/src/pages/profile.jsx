@@ -6,7 +6,7 @@ import axios from "axios";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [showAddress2, setShowAddress2] = useState(false);
+  const [showSecondAddress, setShowSecondAddress] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [editedData, setEditedData] = useState({
     firstName: "",
@@ -23,6 +23,7 @@ function Profile() {
     preferences: "",
     availability: ""
   });
+  const [errors, setErrors] = useState([]);
 
   const states = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA",
@@ -68,8 +69,15 @@ function Profile() {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get("http://localhost:5001/api/volunteerProfile");
+        console.log("Fetched profile data:", response.data);
         setProfileData(response.data);
         setEditedData(response.data);
+
+        // Determine if the second address should be shown
+        const { address2, city2, state2, zipCode2 } = response.data;
+        if (address2 || city2 || state2 || zipCode2) {
+          setShowSecondAddress(true);
+        }
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
@@ -85,26 +93,44 @@ function Profile() {
   const handleCancel = () => {
     setIsEditing(false);
     setEditedData(profileData);
+    setErrors([]);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedData({ ...editedData, [name]: value });
+    const updatedData = { ...editedData, [name]: value };
+    console.log("Updated editedData:", updatedData);
+    setEditedData(updatedData);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
+    console.log("Saving data:", editedData);
     try {
       const response = await axios.put("http://localhost:5001/api/volunteerProfile", editedData);
+      console.log("Response from server:", response.data);
       setProfileData(response.data.volunteerProfile);
+      console.log("New volunteer object:", response.data.volunteerProfile);
       setIsEditing(false);
+      setErrors([]);
     } catch (error) {
-      console.error("Error saving profile data:", error);
+      if (error.response && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Error saving profile data:", error);
+      }
     }
   };
 
-  const handleRemoveAddress2 = () => {
-    setShowAddress2(false);
+  const handleToggleSecondAddress = () => {
+    setShowSecondAddress((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("showSecondAddress", newValue);
+      return newValue;
+    });
+  };
+
+  const handleRemoveAddress = () => {
     setEditedData({
       ...editedData,
       address2: "",
@@ -112,6 +138,7 @@ function Profile() {
       state2: "",
       zipCode2: ""
     });
+    setShowSecondAddress(false);
   };
 
   if (!profileData) {
@@ -142,6 +169,14 @@ function Profile() {
             )}
           </div>
 
+          {errors.length > 0 && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {errors.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={handleSave} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -151,7 +186,7 @@ function Profile() {
                 <input
                   type="text"
                   name="firstName"
-                  value={isEditing ? editedData.firstName : profileData.firstName}
+                  value={editedData.firstName || ""}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -167,7 +202,7 @@ function Profile() {
                 <input
                   type="text"
                   name="lastName"
-                  value={isEditing ? editedData.lastName : profileData.lastName}
+                  value={editedData.lastName || ""}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -179,12 +214,12 @@ function Profile() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address 1 *
+                Address *
               </label>
               <input
                 type="text"
                 name="address1"
-                value={isEditing ? editedData.address1 : profileData.address1}
+                value={editedData.address1 || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
                 required
@@ -201,7 +236,7 @@ function Profile() {
                 <input
                   type="text"
                   name="city1"
-                  value={isEditing ? editedData.city1 : profileData.city1}
+                  value={editedData.city1 || ""}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -216,7 +251,7 @@ function Profile() {
                 </label>
                 <select
                   name="state1"
-                  value={isEditing ? editedData.state1 : profileData.state1}
+                  value={editedData.state1 || ""}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -237,7 +272,7 @@ function Profile() {
                 <input
                   type="text"
                   name="zipCode1"
-                  value={isEditing ? editedData.zipCode1 : profileData.zipCode1}
+                  value={editedData.zipCode1 || ""}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -247,26 +282,26 @@ function Profile() {
               </div>
             </div>
 
-            {!showAddress2 && isEditing && (
+            {!showSecondAddress && isEditing && (
               <div className="flex justify-start">
                 <button
                   type="button"
-                  onClick={() => setShowAddress2(true)}
+                  onClick={handleToggleSecondAddress}
                   className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center"
                 >
-                  + Add Second Address
+                  + Add Secondary Address
                 </button>
               </div>
             )}
 
-            {showAddress2 && (
+            {showSecondAddress && (
               <>
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">Second Address</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Secondary Address</h3>
                   {isEditing && (
                     <button
                       type="button"
-                      onClick={handleRemoveAddress2}
+                      onClick={handleRemoveAddress}
                       className="text-red-600 hover:text-red-700 font-medium"
                     >
                       Remove Address
@@ -281,7 +316,7 @@ function Profile() {
                   <input
                     type="text"
                     name="address2"
-                    value={isEditing ? editedData.address2 : profileData.address2}
+                    value={editedData.address2 || ""}
                     onChange={handleChange}
                     disabled={!isEditing}
                     required
@@ -298,7 +333,7 @@ function Profile() {
                     <input
                       type="text"
                       name="city2"
-                      value={isEditing ? editedData.city2 : profileData.city2}
+                      value={editedData.city2 || ""}
                       onChange={handleChange}
                       disabled={!isEditing}
                       required
@@ -313,7 +348,7 @@ function Profile() {
                     </label>
                     <select
                       name="state2"
-                      value={isEditing ? editedData.state2 : profileData.state2}
+                      value={editedData.state2 || ""}
                       onChange={handleChange}
                       disabled={!isEditing}
                       required
@@ -334,7 +369,7 @@ function Profile() {
                     <input
                       type="text"
                       name="zipCode2"
-                      value={isEditing ? editedData.zipCode2 : profileData.zipCode2}
+                      value={editedData.zipCode2 || ""}
                       onChange={handleChange}
                       disabled={!isEditing}
                       required
@@ -386,7 +421,7 @@ function Profile() {
               </label>
               <textarea
                 name="preferences"
-                value={isEditing ? editedData.preferences : profileData.preferences}
+                value={editedData.preferences || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
                 placeholder="Enter any specific preferences or notes..."
@@ -402,7 +437,7 @@ function Profile() {
               <input
                 type="date"
                 name="availability"
-                value={isEditing ? editedData.availability : profileData.availability}
+                value={editedData.availability || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500

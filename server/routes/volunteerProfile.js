@@ -1,9 +1,8 @@
-
 const express = require("express");
+const router = express.Router();
 const { getVolunteerProfile, updateVolunteerProfile } = require("../controllers/volunteerProfile");
 const validateVolunteerProfile = require("../middleware/validateVolunteerProfile"); // Create this middleware for validation
 
-const router = express.Router();
 
 // Get user profile
 router.get("/", getVolunteerProfile);
