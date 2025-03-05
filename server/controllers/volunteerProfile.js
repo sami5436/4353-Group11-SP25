@@ -20,15 +20,12 @@ let volunteerProfile = {
 
 // GET request handler to retrieve the volunteer profile
 const getVolunteerProfile = (req, res) => {
-  console.log("Inside getVolunteerProfile");
   res.json(volunteerProfile); // Respond with the current volunteer profile
 };
 
 // PUT request handler to update the volunteer profile
 const updateVolunteerProfile = (req, res) => {
-  console.log("Inside updateVolunteerProfile");
   const { firstName, lastName, address1, address2, city1, state1, zipCode1, city2, state2, zipCode2, skills, preferences, availability } = req.body;
-
   // Conditionally update fields if they are present in the request body
   if (firstName !== undefined) volunteerProfile.firstName = firstName;
   if (lastName !== undefined) volunteerProfile.lastName = lastName;
@@ -43,7 +40,6 @@ const updateVolunteerProfile = (req, res) => {
   if (skills !== undefined) volunteerProfile.skills = skills;
   if (preferences !== undefined) volunteerProfile.preferences = preferences;
   if (availability !== undefined) volunteerProfile.availability = availability;
-  console.log("Updated volunteer profile:", volunteerProfile); // Log the updated profile
 
   res.status(200).json({ message: "Profile updated successfully", volunteerProfile });
 };

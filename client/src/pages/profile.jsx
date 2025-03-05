@@ -3,6 +3,8 @@ import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
 import CreatableSelect from 'react-select/creatable';
 import axios from "axios";
+import DatePicker from "react-multi-date-picker";
+import "../styles/volunteerProfileAvailabilityStyling.css"; // Import the custom green theme
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,7 +23,7 @@ function Profile() {
     zipCode2: "",
     skills: [],
     preferences: "",
-    availability: ""
+    availability: []
   });
   const [errors, setErrors] = useState([]);
 
@@ -430,18 +432,16 @@ function Profile() {
               />
             </div>
 
-            <div>
+            <div className="green">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Availability
               </label>
-              <input
-                type="date"
-                name="availability"
-                value={editedData.availability || ""}
-                onChange={handleChange}
+              <DatePicker
+                multiple
+                value={editedData.availability}
+                onChange={(dates) => setEditedData({ ...editedData, availability: dates })}
                 disabled={!isEditing}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                format="MM/DD/YYYY"
               />
             </div>
 

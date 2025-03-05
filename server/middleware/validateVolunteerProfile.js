@@ -1,5 +1,4 @@
 const validateVolunteerProfile = (req, res, next) => {
-  console.log("Validation middleware executed");
   const { firstName, lastName, address1, city1, state1, zipCode1, address2, city2, state2, zipCode2 } = req.body;
   const errors = [];
 
