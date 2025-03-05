@@ -1,10 +1,46 @@
 const validateVolunteerProfile = (req, res, next) => {
-  const { firstName, lastName, address1, city1, state1, zipCode1, address2, city2, state2, zipCode2 } = req.body;
+  const { 
+    firstName, 
+    lastName, 
+    email, 
+    phone, 
+    dateOfBirth, 
+    address1, 
+    city1, 
+    state1, 
+    zipCode1, 
+    address2, 
+    city2, 
+    state2, 
+    zipCode2 
+  } = req.body;
+
   const errors = [];
 
   // Validate required fields
   if (!firstName || !lastName || !address1 || !city1 || !state1 || !zipCode1) {
     errors.push("All primary address fields are required.");
+  }
+
+  // Validate date of birth
+  if (dateOfBirth) {
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    if (dob > today) {
+      errors.push("Date of birth cannot be in the future.");
+    }
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !emailRegex.test(email)) {
+    errors.push("Email must be in a valid format (e.g., user@example.com).");
+  }
+
+  // Validate phone number format (xxx-xxx-xxxx)
+  const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+  if (phone && !phoneRegex.test(phone)) {
+    errors.push("Phone number must be in the format xxx-xxx-xxxx.");
   }
 
   // Validate city fields to contain only letters
