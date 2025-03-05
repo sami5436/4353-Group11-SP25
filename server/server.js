@@ -6,7 +6,7 @@ const adminProfileRoutes = require("./routes/adminProfile");
 const notificationRoutes = require("./routes/notifications");
 const volunteerAssignmentsRoutes = require("./routes/volunteerAssignmentsRoutes");
 const authRoutes = require("./routes/authRoutes");
-
+const userVolunteerRoutes = require("./routes/volunteerProfile");
 const app = express();
 
 
@@ -19,6 +19,7 @@ app.use("/api/adminProfile", adminProfileRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/volunteerAssignments", volunteerAssignmentsRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/volunteerProfile", userVolunteerRoutes);
 
 const PORT = process.env.PORT || 5001;
 
