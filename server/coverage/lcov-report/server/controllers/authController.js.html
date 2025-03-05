@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for server/controllers/notifications.js</title>
+    <title>Code coverage report for server/controllers/authController.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/controllers</a> notifications.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/controllers</a> authController.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.37% </span>
+                <span class="strong">32.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>27/32</span>
+                <span class='fraction'>18/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.28% </span>
+                <span class="strong">6.45% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/14</span>
+                <span class='fraction'>2/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">12.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/9</span>
+                <span class='fraction'>1/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">31.48% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>25/30</span>
+                <span class='fraction'>17/54</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -179,238 +179,244 @@
 <a name='L114'></a><a href='#L114'>114</a>
 <a name='L115'></a><a href='#L115'>115</a>
 <a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">let notifications = [
-    {
-      id: 1,
-      type: 'volunteer_signup',
-      message: 'New volunteer signup: Jane Smith',
-      timestamp: '2025-02-07T10:00:00',
-      read: false,
-      details: 'Contact: jane.smith@gmail.com',
-      userRole: 'admin'
-    },
-    {
-      id: 2,
-      type: 'event_update',
-      message: 'Event "Charity Gala" has been modified',
-      timestamp: '2025-01-24T15:00:00',
-      read: false,
-      details: 'New date approved',
-      userRole: 'admin'
-    },
-    {
-      id: 3,
-      type: 'event_creation',
-      message: 'Event "Toy Drive" has been created',
-      timestamp: '2025-01-24T17:00:00',
-      read: false,
-      details: 'Admin John Doe has initiated the creation',
-      userRole: 'admin'
-    },
-    {
-      id: 4,
-      type: 'event_reminder',
-      message: 'Upcoming Event: Charity Gala tomorrow',
-      timestamp: '2025-02-07T10:00:00',
-      read: false,
-      details: "Event gala will feature a chocolate fountain",
-      userRole: 'volunteer'
-    },
-    {
-      id: 5,
-      type: 'schedule_change',
-      message: 'Your volunteer shift has been updated',
-      timestamp: '2025-01-24T15:00:00',
-      read: false,
-      details: "You will need to usher the kids in",
-      userRole: 'volunteer'
-    },
-    {
-      id: 6,
-      type: 'new_event',
-      message: 'New volunteer opportunity available',
-      timestamp: '2025-01-08T17:00:00',
-      read: false,
-      details: "Get it while you can!",
-      userRole: 'volunteer'
-    }
-  ];
-  
-  const getNotifications = (req, res) =&gt; {
-    const { type, unread, userRole } = req.query;
-    
-    let filteredNotifications = [...notifications];
-    
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (userRole) {
-<span class="cstat-no" title="statement not covered" >      filteredNotifications = filteredNotifications.filter(</span>
-<span class="fstat-no" title="function not covered" >        no</span>tif =&gt; <span class="cstat-no" title="statement not covered" >notif.userRole === userRole</span>
-      );
-    }
-    
-    if (type &amp;&amp; type !== 'all') {
-      filteredNotifications = filteredNotifications.filter(
-        notif =&gt; notif.type === type
-      );
-    }
-    
-    if (unread === 'true') {
-      filteredNotifications = filteredNotifications.filter(
-        notif =&gt; notif.read === false
-      );
-    }
-    
-    res.json(filteredNotifications);
-  };
-  
-  const markAsRead = (req, res) =&gt; {
-    const { id } = req.params;
-    const notificationId = parseInt(id, 10);
-    
-    const notification = notifications.find(n =&gt; n.id === notificationId);
-    
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!notification) {
-<span class="cstat-no" title="statement not covered" >      return res.status(404).json({ error: 'Notification not found' });</span>
-    }
-    
-    notification.read = true;
-    
-    res.json(notification);
-  };
-  
-  const markAllAsRead = (req, res) =&gt; {
-    const { userRole } = req.query;
-    
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (userRole) {
-<span class="cstat-no" title="statement not covered" >      notifications = notifications.map(<span class="fstat-no" title="function not covered" >no</span>tif =&gt; </span>
-<span class="cstat-no" title="statement not covered" >        notif.userRole === userRole ? { ...notif, read: true } : notif</span>
-      );
-    } else {
-      notifications = notifications.map(notif =&gt; ({ ...notif, read: true }));
-    }
-    
-    res.json({ success: true });
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const fs = require('fs');
+const path = require('path');
+&nbsp;
+const usersFilePath = path.join(__dirname, 'users.json');
+&nbsp;
+let users = {};
+let nextUserId = 1;
+&nbsp;
+<span class="missing-if-branch" title="else path not taken" >E</span>if (fs.existsSync(usersFilePath)) {
+  const data = fs.readFileSync(usersFilePath, 'utf-8');
+  users = JSON.parse(data);
+&nbsp;
+  const userIds = Object.keys(users).map(key =&gt; users[key].id);
+  nextUserId = userIds.length &gt; 0 ? Math.max(...userIds) + 1 : <span class="branch-1 cbranch-no" title="branch not covered" >1;</span>
+}
+&nbsp;
+const saveUsersToFile = <span class="fstat-no" title="function not covered" >()</span> =&gt; {
+<span class="cstat-no" title="statement not covered" >  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));</span>
 };
-  
+&nbsp;
+const validateEmail = <span class="fstat-no" title="function not covered" >(e</span>mail) =&gt; {
+  const emailRegex = <span class="cstat-no" title="statement not covered" >/^[^\s@]+@[^\s@]+\.[^\s@]+$/;</span>
+<span class="cstat-no" title="statement not covered" >  return emailRegex.test(email);</span>
+};
+&nbsp;
+const validatePassword = <span class="fstat-no" title="function not covered" >(p</span>assword) =&gt; {
+  const passwordRegex = <span class="cstat-no" title="statement not covered" >/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;</span>
+<span class="cstat-no" title="statement not covered" >  return passwordRegex.test(password);</span>
+};
+&nbsp;
+const findUserByEmail = <span class="fstat-no" title="function not covered" >(e</span>mail) =&gt; {
+<span class="cstat-no" title="statement not covered" >  return Object.values(users).find(<span class="fstat-no" title="function not covered" >us</span>er =&gt; <span class="cstat-no" title="statement not covered" >user.email === email)</span>;</span>
+};
+&nbsp;
+const signup = <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
+  const { email, password, confirmPassword, role } = <span class="cstat-no" title="statement not covered" >req.body;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    if (!email || !password || !confirmPassword) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'All fields are required' });</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!validateEmail(email)) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Invalid email format' });</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (findUserByEmail(email)) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Email already in use' });</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!validatePassword(password)) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ </span>
+        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, and number' 
+      });
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (password !== confirmPassword) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Passwords do not match' });</span>
+    }
+&nbsp;
+    const newUser = <span class="cstat-no" title="statement not covered" >{</span>
+      id: nextUserId++,
+      email,
+      password, 
+      role: role || 'user'
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    users[`user${newUser.id}`] = newUser;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    saveUsersToFile();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    res.status(201).json({ </span>
+      message: 'User registered successfully', 
+      userId: newUser.id 
+    });
+  } catch (error) {
+<span class="cstat-no" title="statement not covered" >    res.status(400).json({ error: error.message });</span>
+  }
+};
+&nbsp;
+const login = <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
+  const { email, password } = <span class="cstat-no" title="statement not covered" >req.body;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    if (!email || !password) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Email and password are required' });</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!validateEmail(email)) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ error: 'Invalid email format' });</span>
+    }
+&nbsp;
+    const user = <span class="cstat-no" title="statement not covered" >findUserByEmail(email);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!user || user.password !== password) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(401).json({ error: 'Invalid credentials' });</span>
+    }
+&nbsp;
+    let redirectPath = <span class="cstat-no" title="statement not covered" >'/volunteer/profile';</span>
+<span class="cstat-no" title="statement not covered" >    if (user.role === 'admin') {</span>
+<span class="cstat-no" title="statement not covered" >      redirectPath = '/admin/profile';</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    res.status(200).json({ </span>
+      message: 'Login successful', 
+      userId: user.id,
+      role: user.role,
+      redirectPath: redirectPath
+    });
+  } catch (error) {
+<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: 'Server error' });</span>
+  }
+};
+&nbsp;
 module.exports = {
-    getNotifications,
-    markAsRead,
-    markAllAsRead
+  signup,
+  login,
+  findUserByEmail
 };</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
