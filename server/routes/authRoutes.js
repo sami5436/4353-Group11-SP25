@@ -14,9 +14,9 @@ router.post('/signup', (req, res) => {
   signup(req, res);
 });
 
-router.get('/role', (req, res) => {
-  checkRole(req, res);
-})
+// router.get('/role', (req, res) => {
+//   checkRole(req, res);
+// })
 
 router.post('/login', login);
 
