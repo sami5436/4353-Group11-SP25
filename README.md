@@ -3,7 +3,7 @@
 ## Team Members
 - Diana Nguyen
 - Gabriela Hernandez Gomez
-- Yusuf Khan
+- [@Yusuf Khan](https://github.com/ykhan-5) 
 - Sami Hamdalla
 
 ## Project Setup
