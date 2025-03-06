@@ -34,5 +34,53 @@
     "email": "f@gmail.com",
     "password": "1234567Ay",
     "role": "user"
+  },
+  "user7": {
+    "id": 7,
+    "email": "testuser@example.com",
+    "password": "TestPass123",
+    "role": "user"
+  },
+  "user8": {
+    "id": 8,
+    "email": "volunteer@example.com",
+    "password": "VolunteerPass123",
+    "role": "user"
+  },
+  "user9": {
+    "id": 9,
+    "email": "admin@example.com",
+    "password": "AdminPass123",
+    "role": "admin"
+  },
+  "user10": {
+    "id": 10,
+    "email": "missingfields@example.com",
+    "password": "Password1",
+    "role": "user"
+  },
+  "user11": {
+    "id": 11,
+    "email": "test@example.com",
+    "password": "StrongPassword123",
+    "role": "user"
+  },
+  "user12": {
+    "id": 12,
+    "email": "test+1741238898283@example.com",
+    "password": "StrongPassword123",
+    "role": "user"
+  },
+  "user13": {
+    "id": 13,
+    "email": "test+1741238936579@example.com",
+    "password": "StrongPassword123",
+    "role": "user"
+  },
+  "user14": {
+    "id": 14,
+    "email": "test+1741239179097@example.com",
+    "password": "StrongPassword123",
+    "role": "user"
   }
 }
