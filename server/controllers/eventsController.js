@@ -108,35 +108,98 @@ const getVolunteers = async (req, res) => {
     res.status(500).json({ message: "Error retrieving volunteers", error });
   }
 };
+// Add this to your backend controller file
 
-// Add a volunteer to an event 
+// Get all volunteers from the volunteers collection
+const getAllVolunteers = async (req, res) => {
+  try {
+    const eventsCollection = db.collection("events");
+    const volunteersCollection = db.collection("volunteers");
+
+    // Fetch all events
+    const allEvents = await eventsCollection.find({}).toArray();
+
+    // Extract unique volunteer IDs from all events
+    let volunteerIds = new Set();
+    allEvents.forEach(event => {
+      (event.volunteers || []).forEach(volunteerId => {
+        if (typeof volunteerId === "string") {
+          volunteerIds.add(volunteerId);
+        }
+      });
+    });
+
+    // Convert Set to Array
+    const volunteerIdArray = Array.from(volunteerIds);
+
+    // Fetch full volunteer details from the `volunteers` collection
+    const volunteers = await volunteersCollection
+      .find({ _id: { $in: volunteerIdArray.map(id => new ObjectId(id)) } })
+      .toArray();
+
+    // Create a lookup map for volunteers
+    const volunteerMap = {};
+    volunteers.forEach(vol => {
+      volunteerMap[vol._id.toString()] = {
+        id: vol._id.toString(),
+        firstName: vol.firstName,
+        lastName: vol.lastName,
+        email: vol.email
+      };
+    });
+
+    // Map the volunteers to their respective events
+    let allVolunteers = [];
+    allEvents.forEach(event => {
+      (event.volunteers || []).forEach(volunteerId => {
+        if (volunteerMap[volunteerId]) {
+          allVolunteers.push({
+            id: volunteerId,
+            firstName: volunteerMap[volunteerId].firstName,
+            lastName: volunteerMap[volunteerId].lastName,
+            email: volunteerMap[volunteerId].email,
+            eventName: event.name
+          });
+        }
+      });
+    });
+
+    res.json(allVolunteers);
+  } catch (error) {
+    console.error("Error retrieving all volunteers:", error);
+    res.status(500).json({ message: "Error retrieving all volunteers", error: error.message });
+  }
+};
+
+
+
 const addVolunteerToEvent = async (req, res) => {
-  const { eventId, volunteerName, volunteerEmail } = req.body;
+  const { eventId, volunteerId, sourceEventId } = req.body;
 
   try {
     const eventsCollection = db.collection("events");
-    const event = await eventsCollection.findOne({ _id: new require("mongodb").ObjectId(eventId) });
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
+    
+    // If sourceEventId is provided, we need to remove the volunteer from there first
+    if (sourceEventId) {
+      await eventsCollection.updateOne(
+        { _id: new ObjectId(sourceEventId) },
+        { $pull: { volunteers: volunteerId } }
+      );
     }
 
-    const newVolunteer = {
-      id: `volunteer-${event.volunteers.length + 1}`,
-      name: volunteerName,
-      email: volunteerEmail
-    };
-
+    // Add volunteer to the target event
     await eventsCollection.updateOne(
-      { _id: new require("mongodb").ObjectId(eventId) },
-      { $push: { volunteers: newVolunteer } }
+      { _id: new ObjectId(eventId) },
+      { $push: { volunteers: volunteerId } }
     );
 
-    res.status(201).json(newVolunteer);
+    res.status(201).json({ volunteerId });
   } catch (error) {
-    res.status(500).json({ message: "Error adding volunteer", error });
+    console.error("Error managing volunteer:", error);
+    res.status(500).json({ message: "Error managing volunteer", error });
   }
 };
+
 
 module.exports = {
   getVolunteerHistory,
@@ -144,5 +207,6 @@ module.exports = {
   getEvents,
   getVolunteers,
   addVolunteerToEvent,
-  updateEvent
+  updateEvent,
+  getAllVolunteers
 };
