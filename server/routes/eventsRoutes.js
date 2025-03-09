@@ -6,7 +6,8 @@ const {
   getEvents, 
   getVolunteers, 
   addVolunteerToEvent,
-  updateEvent  
+  updateEvent,
+  getAllVolunteers
 } = require('../controllers/eventsController');
 
 // GET all events to match frontend request
@@ -14,7 +15,7 @@ router.get('/', getVolunteerHistory);
 
 // Add route for volunteerHistory POST and PUT requests
 router.post('/volunteerHistory', addEvent);
-router.put('/volunteerHistory/:id', updateEvent);
+router.get('/allVolunteers', getAllVolunteers);
 
 // Keep existing routes
 router.get('/history', getVolunteerHistory);

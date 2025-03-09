@@ -18,7 +18,7 @@ function DraggableItem({ id, name }) {
       className="p-3 bg-emerald-600 text-white rounded-2xl cursor-grab shadow-lg"
       style={style}
     >
-      {name}
+      {name || "Unknown Volunteer"}
     </div>
   );
 }
@@ -36,7 +36,7 @@ function DroppableArea({ id, name, assignedVolunteers }) {
       <h3 className="font-bold">{name}</h3>
       {assignedVolunteers.length > 0 ? (
         assignedVolunteers.map((vol) => (
-          <DraggableItem key={vol.id} id={vol.id} name={vol.name} />
+          <DraggableItem key={`${id}-${vol.id}`} id={vol.id} name={vol.name} />
         ))
       ) : (
         <span className="text-gray-500">Drop volunteers here</span>
@@ -46,97 +46,180 @@ function DroppableArea({ id, name, assignedVolunteers }) {
 }
 
 function AdminManageVolunteers() {
-  const [volunteers, setVolunteers] = useState([]);
   const [events, setEvents] = useState([]);
+  const [volunteerDetails, setVolunteerDetails] = useState({});
   const [eventAssignments, setEventAssignments] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch Volunteers
   useEffect(() => {
+    setIsLoading(true);
+
     axios
-      .get("http://localhost:5001/api/events/volunteers")
-      .then((res) => setVolunteers(res.data))
-      .catch((err) => console.error("Error fetching Volunteers:", err));
-  }, []);
+      .get("http://localhost:5001/api/events/allVolunteers")
+      .then((res) => {
+        console.log("All volunteers data:", res.data);
 
-  // Fetch Events and Initialize Assignments
+        const volunteersMap = {};
+        res.data.forEach((volunteer) => {
+          volunteersMap[volunteer.id] = volunteer; // Store full volunteer details
+        });
+
+        setVolunteerDetails(volunteersMap);
+      })
+      .catch((err) => console.error("Error fetching volunteers:", err));
+  }, []); // Run once on component mount
+
   useEffect(() => {
+    if (Object.keys(volunteerDetails).length === 0) return; // Prevent running with empty data
+
     axios
       .get("http://localhost:5001/api/events")
       .then((res) => {
+        console.log("Events data:", res.data);
         setEvents(res.data);
+
         const assignments = res.data.reduce((acc, event) => {
-          acc[event.name] = event.volunteers || [];
+          const formattedVolunteers = (event.volunteers || []).map(
+            (volunteerId) => {
+              const details = volunteerDetails[volunteerId] || {};
+              console.log("volunteer: ", details);
+
+              return {
+                id: volunteerId,
+                name:
+                  details.firstName + " "  + details.lastName ||
+                  `Volunteer ${volunteerId.substring(0, 6)}...`, 
+                email: details.email || "",
+                originalEventId: event._id,
+              };
+            }
+          );
+
+          acc[event.name] = formattedVolunteers;
           return acc;
         }, {});
+
         setEventAssignments(assignments);
+        console.log("Formatted assignments:", assignments);
       })
-      .catch((err) => console.error("Error fetching Events:", err));
-  }, []);
+      .catch((err) => console.error("Error fetching events:", err))
+      .finally(() => setIsLoading(false));
+  }, [volunteerDetails]); // ✅ Runs after `volunteerDetails` is updated
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (!over || !over.id) return;
+    if (!over || !over.id || active.id === over.id) return;
 
     const volunteerId = active.id;
     let sourceEventId = null;
+    let sourceEventName = null;
     let volunteer = null;
 
-    // Find source event
-    for (const eventId in eventAssignments) {
-      const volunteers = eventAssignments[eventId];
+    for (const eventName in eventAssignments) {
+      const volunteers = eventAssignments[eventName];
       const foundVolunteer = volunteers.find((v) => v.id === volunteerId);
       if (foundVolunteer) {
-        sourceEventId = eventId;
+        sourceEventName = eventName;
         volunteer = foundVolunteer;
+        sourceEventId = foundVolunteer.originalEventId;
         break;
       }
     }
 
-    if (!volunteer || sourceEventId === over.id) return;
+    if (!volunteer || sourceEventName === over.id) return;
+
+    const targetEvent = events.find((e) => e.name === over.id);
+    if (!targetEvent) {
+      console.error("Target event not found:", over.id);
+      return;
+    }
 
     setEventAssignments((prev) => {
       const newAssignments = { ...prev };
 
-      // Remove from source
-      newAssignments[sourceEventId] = newAssignments[sourceEventId].filter(
+      // Remove from the source event
+      newAssignments[sourceEventName] = newAssignments[sourceEventName].filter(
         (v) => v.id !== volunteerId
       );
 
-      // Add to target event
-      newAssignments[over.id] = [...newAssignments[over.id], volunteer];
+      // Add to the target event with updated originalEventId
+      newAssignments[over.id] = [
+        ...newAssignments[over.id],
+        {
+          ...volunteer,
+          firstName: volunteer.firstName || "Unknown Volunteer",
+          originalEventId: targetEvent._id,
+        },
+      ];
 
       return newAssignments;
     });
 
-    // Update backend with new volunteer assignment
+    // Send update to backend with source event ID for removal
     axios
       .post("http://localhost:5001/api/events/addVolunteer", {
-        eventId: events.find((e) => e.name === over.id)?.id,
-        volunteerName: volunteer.name,
-        volunteerEmail: volunteer.email
+        eventId: targetEvent._id,
+        volunteerId: volunteerId,
+        sourceEventId: sourceEventId,
       })
-      .catch((err) => console.error("Error updating volunteer assignment:", err));
+      .then((res) => {
+        console.log("Volunteer moved successfully:", res.data);
+      })
+      .catch((err) => {
+        console.error("Error moving volunteer:", err);
+        setEventAssignments((prev) => {
+          const originalAssignments = { ...prev };
+          originalAssignments[sourceEventName] = [
+            ...originalAssignments[sourceEventName],
+            volunteer,
+          ];
+          originalAssignments[over.id] = originalAssignments[over.id].filter(
+            (v) => v.id !== volunteerId
+          );
+          return originalAssignments;
+        });
+      });
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <AdminNavbar />
+        <div className="ml-72 mt-10 p-6">
+          <h2 className="text-2xl font-bold">Manage Volunteers</h2>
+          <p className="mt-4">Loading data...</p>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <AdminNavbar />
-      <h2 className="text-2xl ml-72 mt-10 font-bold">Manage Volunteers</h2>
+      <div className="ml-72 mt-10 p-6">
+        <h2 className="text-2xl font-bold">Manage Volunteers</h2>
 
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="p-6 mt-12 ml-80">
-          <div className="grid grid-cols-3 gap-12">
-            {Object.entries(eventAssignments).map(([eventId, volunteers]) => (
-              <DroppableArea
-                key={eventId}
-                id={eventId}
-                name={eventId}
-                assignedVolunteers={volunteers}
-              />
-            ))}
-          </div>
-        </div>
-      </DndContext>
+        {Object.keys(eventAssignments).length === 0 ? (
+          <p className="mt-4">No events found. Please create events first.</p>
+        ) : (
+          <DndContext onDragEnd={handleDragEnd}>
+            <div className="mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Object.entries(eventAssignments).map(
+                  ([eventName, volunteers]) => (
+                    <DroppableArea
+                      key={eventName}
+                      id={eventName}
+                      name={eventName}
+                      assignedVolunteers={volunteers}
+                    />
+                  )
+                )}
+              </div>
+            </div>
+          </DndContext>
+        )}
+      </div>
     </>
   );
 }

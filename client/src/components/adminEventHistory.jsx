@@ -20,12 +20,12 @@ const EventHistory = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/events`);
       if (!response.ok) {
-        throw new Error('Failed to fetch events');
+        throw new Error("Failed to fetch events");
       }
       const data = await response.json();
-      
-      const transformedData = data.map(event => ({
-        id: event.id,
+
+      const transformedData = data.map((event) => ({
+        id: event._id,
         eventName: event.name,
         date: event.date,
         street: event.address,
@@ -35,9 +35,9 @@ const EventHistory = () => {
         urgency: event.urgency || "Medium", // Default if not provided
         skills: event.skills || [], // Ensure skills is always an array
         description: event.description,
-        volunteers: event.volunteers || []
+        volunteers: event.volunteers || [],
       }));
-      
+
       setEventHistory(transformedData);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -122,7 +122,7 @@ const EventHistory = () => {
     }
 
     try {
-      // Prepare data for backend format
+      // Prepare data for backend format - ensure consistent naming
       const eventData = {
         name: editedEvent.eventName,
         date: editedEvent.date,
@@ -132,60 +132,56 @@ const EventHistory = () => {
         status: editedEvent.status,
         urgency: editedEvent.urgency,
         description: editedEvent.description,
-        skills: editedEvent.skills, // Ensure skills are sent to backend
-        volunteered: false, // Default value
-        volunteers: editedEvent.volunteers || []
+        skills: editedEvent.skills,
+        volunteers: editedEvent.volunteers || [],
       };
+
+      // Log request details for debugging
+      console.log(
+        "Saving event:",
+        isCreating ? "Creating new" : `Updating ID: ${editedEvent.id}`
+      );
+      console.log("Event data:", eventData);
 
       // If creating a new event
       if (isCreating) {
         const response = await fetch(`${API_BASE_URL}/events`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(eventData),
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create event');
+          throw new Error(
+            `Failed to create event: ${response.status} ${response.statusText}`
+          );
         }
 
         // Refresh events list
         fetchEvents();
       } else {
         // Update existing event
-        const response = await fetch(`${API_BASE_URL}/events/${editedEvent.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(eventData),
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/events/${editedEvent.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(eventData),
+          }
+        );
 
         if (!response.ok) {
-          // If endpoint doesn't exist, just update local state for now
-          console.warn("Update endpoint not implemented, updating local state only");
-          setEventHistory(prevEvents => 
-            prevEvents.map(event => 
-              event.id === editedEvent.id ? { 
-                ...event, 
-                eventName: eventData.name,
-                date: eventData.date,
-                city: eventData.city,
-                state: eventData.state,
-                street: eventData.address,
-                status: eventData.status,
-                urgency: eventData.urgency,
-                description: eventData.description,
-                skills: eventData.skills // Update skills in local state too
-              } : event
-            )
+          throw new Error(
+            `Failed to update event: ${response.status} ${response.statusText}`
           );
-        } else {
-          // Refresh events list if endpoint exists
-          fetchEvents();
         }
+
+        // Refresh events list
+        fetchEvents();
       }
 
       handleClose();
@@ -193,28 +189,32 @@ const EventHistory = () => {
       console.error("Error saving event:", error);
       // Display error message to user
       setErrors({
-        submit: "Failed to save event. Please try again."
+        submit: `Failed to save event: ${error.message}`,
       });
     }
   };
 
   // For adding volunteers to events
-  const addVolunteerToEvent = async (eventId, volunteerName, volunteerEmail) => {
+  const addVolunteerToEvent = async (
+    eventId,
+    volunteerName,
+    volunteerEmail
+  ) => {
     try {
       const response = await fetch(`${API_BASE_URL}/events/addVolunteer`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           eventId,
           volunteerName,
-          volunteerEmail
+          volunteerEmail,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add volunteer');
+        throw new Error("Failed to add volunteer");
       }
 
       // Refresh events to get updated volunteer list
@@ -250,13 +250,13 @@ const EventHistory = () => {
     const eventsWithCoordinates = events.map((event, index) => ({
       ...event,
       // Mock coordinates - in real app, you would geocode the address
-      latitude: event.latitude || (39.8283 + (index * 0.5)),
-      longitude: event.longitude || (-98.5795 + (index * 0.5))
+      latitude: event.latitude || 39.8283 + index * 0.5,
+      longitude: event.longitude || -98.5795 + index * 0.5,
     }));
 
     return (
-      <LoadScript googleMapsApiKey="YOUR_API_KEY">
-        <GoogleMap
+<LoadScript googleMapsApiKey="AIzaSyBNl1aAfBwzKsNFnjnSXpMiQ7Z-gh_x45U">
+<GoogleMap
           mapContainerStyle={containerStyle}
           center={defaultCenter}
           zoom={4}
@@ -509,7 +509,7 @@ const EventHistory = () => {
                                 input.value.trim(),
                               ]);
                             }
-                            input.value = '';
+                            input.value = "";
                           }
                         }}
                         className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
@@ -547,11 +547,13 @@ const EventHistory = () => {
                       </div>
                     ))}
                   </div>
-                  
+
                   {editedEvent.skills.length > 0 && (
                     <div className="mt-3">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Selected Skills</span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Selected Skills
+                        </span>
                         <button
                           onClick={() => handleEventChange("skills", [])}
                           className="text-xs text-gray-600 hover:text-gray-900 cursor-pointer"
@@ -561,8 +563,8 @@ const EventHistory = () => {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {editedEvent.skills.map((skill) => (
-                          <div 
-                            key={skill} 
+                          <div
+                            key={skill}
                             className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-emerald-100 text-emerald-800 rounded-md"
                           >
                             <span>{skill}</span>
@@ -602,31 +604,40 @@ const EventHistory = () => {
                 </div>
 
                 {/* Display custom skills section */}
-                {editedEvent.skills && editedEvent.skills.some(skill => !availableSkills.includes(skill)) && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Custom Skills
-                    </label>
-                    <div className="border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
-                      {editedEvent.skills
-                        .filter(skill => !availableSkills.includes(skill))
-                        .map((skill, index) => (
-                          <div key={index} className="flex justify-between items-center py-1">
-                            <span className="text-sm">{skill}</span>
-                            <button
-                              onClick={() => {
-                                const updatedSkills = editedEvent.skills.filter(s => s !== skill);
-                                handleEventChange("skills", updatedSkills);
-                              }}
-                              className="text-red-500 hover:text-red-700"
+                {editedEvent.skills &&
+                  editedEvent.skills.some(
+                    (skill) => !availableSkills.includes(skill)
+                  ) && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Custom Skills
+                      </label>
+                      <div className="border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
+                        {editedEvent.skills
+                          .filter((skill) => !availableSkills.includes(skill))
+                          .map((skill, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center py-1"
                             >
-                              ×
-                            </button>
-                          </div>
-                        ))}
+                              <span className="text-sm">{skill}</span>
+                              <button
+                                onClick={() => {
+                                  const updatedSkills =
+                                    editedEvent.skills.filter(
+                                      (s) => s !== skill
+                                    );
+                                  handleEventChange("skills", updatedSkills);
+                                }}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -678,7 +689,8 @@ const EventHistory = () => {
                       Volunteers ({editedEvent.volunteers.length})
                     </label>
                     <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
-                      {editedEvent.volunteers && editedEvent.volunteers.length > 0 ? (
+                      {editedEvent.volunteers &&
+                      editedEvent.volunteers.length > 0 ? (
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b">
@@ -688,7 +700,10 @@ const EventHistory = () => {
                           </thead>
                           <tbody>
                             {editedEvent.volunteers.map((volunteer, idx) => (
-                              <tr key={volunteer.id || idx} className="border-b border-gray-100">
+                              <tr
+                                key={volunteer.id || idx}
+                                className="border-b border-gray-100"
+                              >
                                 <td className="p-1">{volunteer.name}</td>
                                 <td className="p-1">{volunteer.email}</td>
                               </tr>
@@ -696,7 +711,9 @@ const EventHistory = () => {
                           </tbody>
                         </table>
                       ) : (
-                        <p className="text-gray-500 text-center py-2">No volunteers yet</p>
+                        <p className="text-gray-500 text-center py-2">
+                          No volunteers yet
+                        </p>
                       )}
                     </div>
                   </div>
