@@ -14,7 +14,7 @@ router.get('/', getVolunteerHistory);
 
 // Add route for volunteerHistory POST and PUT requests
 router.post('/volunteerHistory', addEvent);
-router.put('/volunteerHistory/:id', updateEvent);
+// router.put('/events/:id', updateEvent);
 
 // Keep existing routes
 router.get('/history', getVolunteerHistory);

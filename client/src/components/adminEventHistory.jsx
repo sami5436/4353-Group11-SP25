@@ -25,7 +25,7 @@ const EventHistory = () => {
       const data = await response.json();
       
       const transformedData = data.map(event => ({
-        id: event.id,
+        id: event._id,
         eventName: event.name,
         date: event.date,
         street: event.address,
@@ -61,7 +61,7 @@ const EventHistory = () => {
     setEditedEvent({ ...event });
     setIsCreating(false);
   };
-
+  
   const handleCreateEvent = () => {
     setSelectedEvent(newEvent);
     setEditedEvent({ ...newEvent });
@@ -102,27 +102,27 @@ const EventHistory = () => {
       "urgency",
     ];
     let newErrors = {};
-
+  
     // Check required fields
     requiredFields.forEach((field) => {
       if (!editedEvent[field] || editedEvent[field].trim() === "") {
         newErrors[field] = "This field is required";
       }
     });
-
+  
     // Check if at least one skill is selected
     if (editedEvent.skills.length === 0) {
       newErrors.skills = "At least one skill must be selected";
     }
-
+  
     // If errors exist, update state and stop submission
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+  
     try {
-      // Prepare data for backend format
+      // Prepare data for backend format - ensure consistent naming
       const eventData = {
         name: editedEvent.eventName,
         date: editedEvent.date,
@@ -132,11 +132,14 @@ const EventHistory = () => {
         status: editedEvent.status,
         urgency: editedEvent.urgency,
         description: editedEvent.description,
-        skills: editedEvent.skills, // Ensure skills are sent to backend
-        volunteered: false, // Default value
+        skills: editedEvent.skills,
         volunteers: editedEvent.volunteers || []
       };
-
+  
+      // Log request details for debugging
+      console.log("Saving event:", isCreating ? "Creating new" : `Updating ID: ${editedEvent.id}`);
+      console.log("Event data:", eventData);
+  
       // If creating a new event
       if (isCreating) {
         const response = await fetch(`${API_BASE_URL}/events`, {
@@ -146,11 +149,11 @@ const EventHistory = () => {
           },
           body: JSON.stringify(eventData),
         });
-
+  
         if (!response.ok) {
-          throw new Error('Failed to create event');
+          throw new Error(`Failed to create event: ${response.status} ${response.statusText}`);
         }
-
+  
         // Refresh events list
         fetchEvents();
       } else {
@@ -162,38 +165,21 @@ const EventHistory = () => {
           },
           body: JSON.stringify(eventData),
         });
-
+  
         if (!response.ok) {
-          // If endpoint doesn't exist, just update local state for now
-          console.warn("Update endpoint not implemented, updating local state only");
-          setEventHistory(prevEvents => 
-            prevEvents.map(event => 
-              event.id === editedEvent.id ? { 
-                ...event, 
-                eventName: eventData.name,
-                date: eventData.date,
-                city: eventData.city,
-                state: eventData.state,
-                street: eventData.address,
-                status: eventData.status,
-                urgency: eventData.urgency,
-                description: eventData.description,
-                skills: eventData.skills // Update skills in local state too
-              } : event
-            )
-          );
-        } else {
-          // Refresh events list if endpoint exists
-          fetchEvents();
+          throw new Error(`Failed to update event: ${response.status} ${response.statusText}`);
         }
+  
+        // Refresh events list
+        fetchEvents();
       }
-
+  
       handleClose();
     } catch (error) {
       console.error("Error saving event:", error);
       // Display error message to user
       setErrors({
-        submit: "Failed to save event. Please try again."
+        submit: `Failed to save event: ${error.message}`
       });
     }
   };
