@@ -6,6 +6,7 @@ let adminInfo = {
     position: "Administrator",
     emergencyContact: "Jane Doe",
     emergencyPhone: "111-222-3333",
+    fullySignedUp: false
   };
   
   const getAdminProfile = (req, res) => {
@@ -20,6 +21,14 @@ let adminInfo = {
     if (phone) adminInfo.phone = phone;
     if (emergencyContact) adminInfo.emergencyContact = emergencyContact;
     if (emergencyPhone) adminInfo.emergencyPhone = emergencyPhone;
+
+    adminInfo.fullySignedUp = Boolean(
+      adminInfo.fullName &&
+      adminInfo.email &&
+      adminInfo.phone &&
+      adminInfo.emergencyContact &&
+      adminInfo.emergencyPhone
+    );
     
     res.json(adminInfo);
   };
