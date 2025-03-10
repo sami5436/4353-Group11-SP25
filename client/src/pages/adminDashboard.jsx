@@ -8,7 +8,6 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("profile");
 
-
     const [profileData, setProfileData] = useState({
         fullName: "",
         adminId: "",
@@ -32,6 +31,20 @@ const AdminDashboard = () => {
                 setIsLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (!profileData.fullySignedUp && activeTab !== "profile") {
+            setActiveTab("profile");
+        }
+    }, [activeTab, profileData.fullySignedUp]);
+
+    const handleTabChange = (tab) => {
+        if (!profileData.fullySignedUp) {
+            setErrorMessage("Please complete your profile before accessing other features.");
+            return;
+        }
+        setActiveTab(tab);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -80,7 +93,12 @@ const AdminDashboard = () => {
         axios.put("http://localhost:5001/api/adminProfile", formValues)
             .then((res) => {
                 setProfileData(res.data);
-                alert("Profile updated successfully!");
+                if (res.data.fullySignedUp) {
+                    alert("Profile updated successfully! You now have access to all features.");
+                    window.location.reload();
+                } else {
+                    alert("Profile updated successfully!");
+                }
             })
             .catch((err) => {
                 console.error("Error updating profile:", err);
