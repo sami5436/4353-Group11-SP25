@@ -144,7 +144,7 @@ const AdminDashboard = () => {
                                         <input 
                                             type="text" 
                                             name="position"
-                                            defaultValue={profileData.position || ""} 
+                                            defaultValue="Administrator"
                                             readOnly 
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-200 text-gray-700 focus:outline-none" 
                                         />

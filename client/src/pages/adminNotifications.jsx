@@ -8,7 +8,7 @@ const AdminNotifications = () => {
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
-        let url = 'http://localhost:5001/api/notifications?userRole=admin';
+        let url = 'http://localhost:5001/api/notifications?recipientType=admin';
         if (filter === 'unread') {
           url += '&unread=true';
         } else if (filter !== 'all') {
@@ -22,10 +22,11 @@ const AdminNotifications = () => {
       
 
     const markAllAsRead = () => {
-        axios.put('http://localhost:5001/api/notifications/markAllRead?userRole=admin')
+        axios.put('http://localhost:5001/api/notifications/markAllRead?recipientType=admin')
             .then(res => {
             if (res.data.success) {
                 setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+                window.location.reload();
             }
             })
             .catch(err => console.error("Error marking all notifications as read:", err));
@@ -35,10 +36,11 @@ const AdminNotifications = () => {
         axios.put(`http://localhost:5001/api/notifications/${id}/read`)
             .then(res => {
             setNotifications(notifications.map(notif =>
-                notif.id === id ? { ...notif, read: true } : notif
+                notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
             ));
             })
             .catch(err => console.error("Error marking notification as read:", err));
+            window.location.reload();
     };
 
     const formatFilterLabel = (filterType) => {
@@ -60,7 +62,7 @@ const AdminNotifications = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            <div  className="w-64 fixed">
+            <div className="w-64 fixed">
                 <AdminNavbar />
             </div>
 
@@ -77,7 +79,6 @@ const AdminNotifications = () => {
                             </button>
                         </div>
 
-                        {/* this filtering is happening at the front end but eventually will need to be an implemented back end logic */}
                         <div className="mt-4 flex flex-wrap gap-2">
                             {filterTypes.map(filterType => (
                                 <button
@@ -99,7 +100,7 @@ const AdminNotifications = () => {
                         {notifications.length > 0 ? (
                             notifications.map(notification => (
                                 <div
-                                    key={notification.id}
+                                    key={notification.notifId}
                                     className={`p-6 ${!notification.read ? 'bg-emerald-50' : ''}`}
                                 >
                                     <div className="flex justify-between items-start">
@@ -116,15 +117,14 @@ const AdminNotifications = () => {
                                                 {new Date(notification.timestamp).toLocaleString()}
                                             </span>
                                             {!notification.read && (
-                                                    <button
-                                                        onClick={() => markAsRead(notification.id)}
-                                                        className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
-                                                        title="Mark as read"
-                                                    >
-                                                        <Check className="w-5 h-5 text-emerald-600" />
-                                                    </button>
+                                                <button
+                                                    onClick={() => markAsRead(notification.notifId)}
+                                                    className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
+                                                    title="Mark as read"
+                                                >
+                                                    <Check className="w-5 h-5 text-emerald-600" />
+                                                </button>
                                             )}
-
                                         </div>
                                     </div>
                                 </div>
