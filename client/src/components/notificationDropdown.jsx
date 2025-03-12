@@ -9,7 +9,7 @@ const NotificationDropdown = ({ userRole = 'volunteer' }) => {
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
-        axios.get(`http://localhost:5001/api/notifications?userRole=${userRole}&unread=true`)
+        axios.get(`http://localhost:5001/api/notifications?recipientType=${userRole}&unread=true`)
             .then((res) => setNotifications(res.data))
             .catch((err) => console.error("Error fetching notifications:", err));
     }, [userRole]);
@@ -20,7 +20,7 @@ const NotificationDropdown = ({ userRole = 'volunteer' }) => {
         axios.put(`http://localhost:5001/api/notifications/${id}/read`)
             .then(() => {
                 setNotifications(notifications.map(notif =>
-                    notif.id === id ? { ...notif, read: true } : notif
+                    notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
                 ));
             })
             .catch((err) => console.error("Error marking notification as read:", err));
@@ -69,11 +69,11 @@ const NotificationDropdown = ({ userRole = 'volunteer' }) => {
                         {notifications.length > 0 ? (
                             notifications.map(notification => (
                                 <div
-                                 key={notification.id}
+                                 key={notification.notifId}
                                  className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
                                     !notification.read ? 'bg-emerald-50' : ''
                                  }`}
-                                 onClick={() => markAsRead(notification.id)}
+                                 onClick={() => markAsRead(notification.notifId)}
                                 >
                                     <p className="text-sm mb-1 text-gray-800">{notification.message}</p>
                                     <p className="text-xs text-gray-500">

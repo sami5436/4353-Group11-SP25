@@ -1,117 +1,97 @@
-let notifications = [
-    {
-      id: 1,
-      type: 'volunteer_signup',
-      message: 'New volunteer signup: Jane Smith',
-      timestamp: '2025-02-07T10:00:00',
-      read: false,
-      details: 'Contact: jane.smith@gmail.com',
-      userRole: 'admin'
-    },
-    {
-      id: 2,
-      type: 'event_update',
-      message: 'Event "Charity Gala" has been modified',
-      timestamp: '2025-01-24T15:00:00',
-      read: false,
-      details: 'New date approved',
-      userRole: 'admin'
-    },
-    {
-      id: 3,
-      type: 'event_creation',
-      message: 'Event "Toy Drive" has been created',
-      timestamp: '2025-01-24T17:00:00',
-      read: false,
-      details: 'Admin John Doe has initiated the creation',
-      userRole: 'admin'
-    },
-    {
-      id: 4,
-      type: 'event_reminder',
-      message: 'Upcoming Event: Charity Gala tomorrow',
-      timestamp: '2025-02-07T10:00:00',
-      read: false,
-      details: "Event gala will feature a chocolate fountain",
-      userRole: 'volunteer'
-    },
-    {
-      id: 5,
-      type: 'schedule_change',
-      message: 'Your volunteer shift has been updated',
-      timestamp: '2025-01-24T15:00:00',
-      read: false,
-      details: "You will need to usher the kids in",
-      userRole: 'volunteer'
-    },
-    {
-      id: 6,
-      type: 'new_event',
-      message: 'New volunteer opportunity available',
-      timestamp: '2025-01-08T17:00:00',
-      read: false,
-      details: "Get it while you can!",
-      userRole: 'volunteer'
-    }
-  ];
+const connectDB = require("../db");
+const { ObjectId } = require("mongodb");
+
+let db;
+connectDB().then(database => db = database); 
   
-  const getNotifications = (req, res) => {
-    const { type, unread, userRole } = req.query;
+const getNotifications = async (req, res) => {
+  try {
+    const { type, unread, recipientType } = req.query;
     
-    let filteredNotifications = [...notifications];
+    const query = {};
     
-    if (userRole) {
-      filteredNotifications = filteredNotifications.filter(
-        notif => notif.userRole === userRole
-      );
+    if (recipientType) {
+      query.recipientType = recipientType;
     }
     
     if (type && type !== 'all') {
-      filteredNotifications = filteredNotifications.filter(
-        notif => notif.type === type
-      );
+      query.notificationType = type;
     }
     
     if (unread === 'true') {
-      filteredNotifications = filteredNotifications.filter(
-        notif => notif.read === false
-      );
+      query.read = false;
     }
     
-    res.json(filteredNotifications);
-  };
+    const notificationsCollection = db.collection("notifications");
+    const notifications = await notificationsCollection.find(query).sort({ "timestamp": -1 }).toArray();
+    
+    res.json(notifications);
+  } catch (error) {
+    console.error("Error retrieving notifications:", error);
+    res.status(500).json({ message: "Error retrieving notifications", error: error.message });
+  }
+};
+
   
-  const markAsRead = (req, res) => {
+const markAsRead = async (req, res) => {
+  try {
     const { id } = req.params;
-    const notificationId = parseInt(id, 10);
     
-    const notification = notifications.find(n => n.id === notificationId);
+    const notificationsCollection = db.collection("notifications");
     
-    if (!notification) {
+    const result = await notificationsCollection.updateOne(
+      { notifId: parseInt(id) }, 
+      { $set: { read: true } }
+    );
+    
+    if (result.matchedCount === 0) {
       return res.status(404).json({ error: 'Notification not found' });
     }
     
-    notification.read = true;
+    const updatedNotification = await notificationsCollection.findOne({ notifId: parseInt(id) });
     
-    res.json(notification);
-  };
+    res.json(updatedNotification);
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    res.status(500).json({ message: "Error marking notification as read", error: error.message });
+  }
+};
+
   
-  const markAllAsRead = (req, res) => {
-    const { userRole } = req.query;
+const markAllAsRead = async (req, res) => {
+  try {
+    const { recipientType, recipientId } = req.query;
     
-    if (userRole) {
-      notifications = notifications.map(notif => 
-        notif.userRole === userRole ? { ...notif, read: true } : notif
-      );
-    } else {
-      notifications = notifications.map(notif => ({ ...notif, read: true }));
+    const query = { read: false };
+    
+    if (recipientType) {
+      query.recipientType = recipientType;
     }
     
-    res.json({ success: true });
+    if (recipientId) {
+      query.recipientId = recipientId;
+    }
+    
+    const notificationsCollection = db.collection("notifications");
+    
+    const result = await notificationsCollection.updateMany(
+      query,
+      { $set: { read: true } }
+    );
+    
+    res.json({ 
+      success: true, 
+      modifiedCount: result.modifiedCount 
+    });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    res.status(500).json({ message: "Error marking all notifications as read", error: error.message });
+  }
 };
+
   
 module.exports = {
-    getNotifications,
-    markAsRead,
-    markAllAsRead
+  getNotifications,
+  markAsRead,
+  markAllAsRead
 };
