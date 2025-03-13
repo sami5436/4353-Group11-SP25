@@ -6,9 +6,12 @@ import axios from 'axios';
 const AdminNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState('all');
+    
+    const adminId = "ADMIN-001";
+    const recipientType = "admin";
 
     useEffect(() => {
-        let url = 'http://localhost:5001/api/notifications?recipientType=admin';
+        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}&recipientId=${adminId}`;
         if (filter === 'unread') {
           url += '&unread=true';
         } else if (filter !== 'all') {
@@ -20,24 +23,23 @@ const AdminNotifications = () => {
           .catch(err => console.error("Error fetching notifications:", err));
     }, [filter]);
       
-
     const markAllAsRead = () => {
-        axios.put('http://localhost:5001/api/notifications/markAllRead?recipientType=admin')
+        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}&recipientId=${adminId}`)
             .then(res => {
-            if (res.data.success) {
-                setNotifications(notifications.map(notif => ({ ...notif, read: true })));
-                window.location.reload();
-            }
+                if (res.data.success) {
+                    setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+                }
             })
             .catch(err => console.error("Error marking all notifications as read:", err));
+            window.location.reload();
     };
 
     const markAsRead = (id) => {
         axios.put(`http://localhost:5001/api/notifications/${id}/read`)
             .then(res => {
-            setNotifications(notifications.map(notif =>
-                notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
-            ));
+                setNotifications(notifications.map(notif =>
+                    notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
+                ));
             })
             .catch(err => console.error("Error marking notification as read:", err));
             window.location.reload();
@@ -58,7 +60,6 @@ const AdminNotifications = () => {
         'event_update',
         'event_creation'
     ];
-
 
     return (
         <div className="flex h-screen bg-gray-100">
