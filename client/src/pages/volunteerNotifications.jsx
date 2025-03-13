@@ -6,9 +6,12 @@ import { Check } from 'lucide-react';
 const VolunteerNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState('all');
+    
+    const volunteerId = "VOL-001";
+    const recipientType = "volunteer";
 
     useEffect(() => {
-        let url = 'http://localhost:5001/api/notifications?userRole=volunteer';
+        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}&recipientId=${volunteerId}`;
         if (filter === 'unread') {
             url += '&unread=true';
         } else if (filter !== 'all') {
@@ -21,10 +24,11 @@ const VolunteerNotifications = () => {
     }, [filter]);
 
     const markAllAsRead = () => {
-        axios.put('http://localhost:5001/api/notifications/markAllRead?userRole=volunteer')
+        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}&recipientId=${volunteerId}`)
             .then(res => {
                 if (res.data.success) {
                     setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+                    window.location.reload();
                 }
             })
             .catch(err => console.error("Error marking all notifications as read:", err));
@@ -34,10 +38,11 @@ const VolunteerNotifications = () => {
         axios.put(`http://localhost:5001/api/notifications/${id}/read`)
             .then(res => {
                 setNotifications(notifications.map(notif =>
-                    notif.id === id ? { ...notif, read: true } : notif
+                    notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
                 ));
             })
             .catch(err => console.error("Error marking notification as read:", err));
+            window.location.reload();
     };
 
     const filterTypes = [
@@ -58,7 +63,7 @@ const VolunteerNotifications = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            <div  className="w-64 fixed">
+            <div className="w-64 fixed">
                 <VolunteerNavbar />
             </div>
 
@@ -96,7 +101,7 @@ const VolunteerNotifications = () => {
                     {notifications.length > 0 ? (
                             notifications.map(notification => (
                                 <div
-                                    key={notification.id}
+                                    key={notification.notifId}
                                     className={`p-6 ${!notification.read ? 'bg-emerald-50' : ''}`}
                                 >
                                     <div className="flex justify-between items-start">
@@ -114,7 +119,7 @@ const VolunteerNotifications = () => {
                                             </span>
                                             {!notification.read && (
                                                 <button
-                                                    onClick={() => markAsRead(notification.id)}
+                                                    onClick={() => markAsRead(notification.notifId)}
                                                     className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
                                                     title="Mark as read"
                                                 >
@@ -133,9 +138,8 @@ const VolunteerNotifications = () => {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };
 
-export default VolunteerNotifications
+export default VolunteerNotifications;

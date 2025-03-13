@@ -6,12 +6,16 @@ connectDB().then(database => db = database);
   
 const getNotifications = async (req, res) => {
   try {
-    const { type, unread, recipientType } = req.query;
+    const { type, unread, recipientType, recipientId } = req.query;
     
     const query = {};
     
     if (recipientType) {
       query.recipientType = recipientType;
+    }
+    
+    if (recipientId) {
+      query.recipientId = recipientId;
     }
     
     if (type && type !== 'all') {
@@ -63,6 +67,10 @@ const markAllAsRead = async (req, res) => {
     const { recipientType, recipientId } = req.query;
     
     const query = { read: false };
+    
+    if (!recipientType && !recipientId) {
+      return res.status(400).json({ message: "Either recipientType or recipientId is required" });
+    }
     
     if (recipientType) {
       query.recipientType = recipientType;

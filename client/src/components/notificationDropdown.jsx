@@ -3,16 +3,18 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 
-const NotificationDropdown = ({ userRole = 'volunteer' }) => {
+const NotificationDropdown = ({ userRole = 'admin' }) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    
+    const userId = userRole === 'admin' ? 'ADMIN-001' : 'VOL-001';
 
     useEffect(() => {
-        axios.get(`http://localhost:5001/api/notifications?recipientType=${userRole}&unread=true`)
+        axios.get(`http://localhost:5001/api/notifications?recipientType=${userRole}&recipientId=${userId}&unread=true`)
             .then((res) => setNotifications(res.data))
             .catch((err) => console.error("Error fetching notifications:", err));
-    }, [userRole]);
+    }, [userRole, userId]);
 
     const unreadCount = notifications.filter(notif => !notif.read).length;
 
