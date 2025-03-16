@@ -8,12 +8,13 @@ function VolunteerAssignments() {
   const [isOpen, setIsOpen] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
   const [assignedEvents, setAssignedEvents] = useState([]);
-  const volunteerId = "volunteer-1"; // Set the volunteer ID dynamically based on login
 
   useEffect(() => {
     if (isOpen) {
+      const volunteerId = "67cd130e640aa5caa84fac56"; 
+      
       axios
-        .get(`http://localhost:5001/api/volunteerAssignments?volunteerId=${volunteerId}`)
+        .get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}/upcoming`)
         .then((response) => {
           setAssignedEvents(response.data);
         })

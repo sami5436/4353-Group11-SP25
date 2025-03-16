@@ -8,11 +8,12 @@ function History() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5001/api/events/history")
+    const volunteerId = "67cd130e640aa5caa84fac56";
+    
+    axios.get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}`)
       .then((res) => setEvents(res.data))
-      .catch((err) => console.error("Error fetching volunteerHistory:", err));
+      .catch((err) => console.error("Error fetching volunteer events:", err));
   }, []);
-
   const openModal = (event) => {
     setSelectedEvent(event);
   };
