@@ -4,9 +4,7 @@ const { ObjectId } = require("mongodb");
 let db;
 connectDB().then(database => db = database);
 
-/**
- * Get all events assigned to a volunteer
- */
+
 const getAssignments = async (req, res) => {
   const volunteerId = req.query.volunteerId;
   
@@ -15,7 +13,6 @@ const getAssignments = async (req, res) => {
   }
   
   try {
-    // Validate the volunteer ID format
     let objectId;
     try {
       objectId = new ObjectId(volunteerId);
@@ -41,7 +38,6 @@ const getAssignments = async (req, res) => {
       return res.status(404).json({ message: "No events found for this volunteer." });
     }
     
-    // Format the response to include the "volunteered" flag
     const formattedEvents = assignedEvents.map(event => ({
       ...event,
       volunteered: true // Since we're only getting events they volunteered for
@@ -54,9 +50,7 @@ const getAssignments = async (req, res) => {
   }
 };
 
-/**
- * Assign a volunteer to an event based on matching criteria
- */
+
 const assignVolunteer = async (req, res) => {
   const hardcodedVolunteerId = "67dc7711789abd6590688cf4";
   

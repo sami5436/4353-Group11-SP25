@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { X } from "lucide-react";
+import Cookies from "js-cookie";
 
 function History() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    const volunteerId = "67dbaa8682e672031a55f7ee";
+    const volunteerId = Cookies.get("userId"); 
     
     axios.get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}`)
       .then((res) => {

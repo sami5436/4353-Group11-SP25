@@ -3,6 +3,7 @@ import axios from "axios";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import Cookies from "js-cookie";
 
 function VolunteerAssignments() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +12,7 @@ function VolunteerAssignments() {
 
   useEffect(() => {
     if (isOpen) {
-      const volunteerId = "67dbaa8682e672031a55f7ee"; 
+      const volunteerId = Cookies.get("userId"); // Retrieve userId from cookie
       
       axios
         .get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}/upcoming`)
