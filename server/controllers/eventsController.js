@@ -112,7 +112,7 @@ const getVolunteers = async (req, res) => {
 const getAllVolunteers = async (req, res) => {
   try {
     const eventsCollection = db.collection("events");
-    const volunteersCollection = db.collection("volunteers");
+    const volunteersCollection = db.collection("users");
 
     // Fetch all events
     const allEvents = await eventsCollection.find({}).toArray();
@@ -210,7 +210,7 @@ const getEventsByVolunteerId = async (req, res) => {
     }
     
     const eventsCollection = db.collection("events");
-    const volunteersCollection = db.collection("volunteers");
+    const volunteersCollection = db.collection("users");
     
     // First, check if the volunteer exists
     const volunteer = await volunteersCollection.findOne({ _id: objectId });

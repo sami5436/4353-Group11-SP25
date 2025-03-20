@@ -8,12 +8,19 @@ function History() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    const volunteerId = "67cd130e640aa5caa84fac56";
+    const volunteerId = "67dbaa8682e672031a55f7ee";
     
     axios.get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}`)
-      .then((res) => setEvents(res.data))
+      .then((res) => {
+        const updatedEvents = res.data.map(event => ({
+          ...event,
+          volunteered: event.status === "Completed" ? true : false
+        }));
+        setEvents(updatedEvents);
+      })
       .catch((err) => console.error("Error fetching volunteer events:", err));
   }, []);
+
   const openModal = (event) => {
     setSelectedEvent(event);
   };
@@ -52,7 +59,7 @@ function History() {
                     <td className="py-3 px-4 border-b border-gray-300">{event.date}</td>
                     <td className="py-3 px-4 border-b border-gray-300">{event.address}, {event.city}, {event.state}</td>
                     <td className={`py-3 px-4 border-b border-gray-300 font-semibold ${
-                      event.status === "Upcoming" ? "text-green-600" : "text-gray-600"
+                      event.status === "Upcoming" ? "text-green-600" : event.status === "Canceled" ? "text-red-600" : "text-gray-600"
                     }`}>{event.status}</td>
                     <td className={`py-3 px-4 border-b border-gray-300 font-semibold ${
                       event.volunteered ? "text-blue-600" : "text-red-600"
