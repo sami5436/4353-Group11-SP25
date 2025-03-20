@@ -8,17 +8,17 @@ function Signup() {
     password: "",
     confirmPassword: "",
     termsAgreed: false,
-    role: "volunteer", // Default role set to volunteer
+    role: "volunteer",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const toggleRole = () => {
+  const handleRoleChange = (role) => {
     setFormData((prevState) => ({
       ...prevState,
-      role: prevState.role === "volunteer" ? "admin" : "volunteer",
+      role,
     }));
   };
 
@@ -36,7 +36,6 @@ function Signup() {
   };
 
   const validatePassword = (password) => {
-    // At least 8 characters, one uppercase, one lowercase, one number
     const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     return re.test(password);
   };
@@ -45,7 +44,6 @@ function Signup() {
     e.preventDefault();
     setError("");
 
-    // Validation checks
     if (!validateEmail(formData.email)) {
       setError("Invalid email format");
       return;
@@ -69,18 +67,8 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/signup",
-        {
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          role: formData.role, // Include role in the signup request
-        }
-      );
-
+      const response = await axios.post("http://localhost:5001/api/auth/signup", formData);
       console.log(response.data);
-
       navigate("/email-validate", { state: { email: formData.email } });
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
@@ -92,42 +80,28 @@ function Signup() {
       <div className="absolute top-0 left-0 z-[-2] h-full w-full rotate-180 transform bg-gradient-to-b from-emerald-500 to-emerald-900"></div>
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-[#F8F9FA] p-8 shadow-emerald-900/50 rounded-xl shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-            Create your account
-          </h2>
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Create your account</h2>
 
           <div className="flex items-center justify-center mb-6">
-            <label
-              htmlFor="Toggle3"
-              className="inline-flex items-center p-2 rounded-md cursor-pointer"
+            <button
+              onClick={() => handleRoleChange("volunteer")}
+              className={`px-4 py-2 rounded-l-md ${formData.role === "volunteer" ? "bg-emerald-600 text-white" : "bg-gray-200 text-black cursor-pointer"}`}
             >
-              <input
-                id="Toggle3"
-                type="checkbox"
-                className="hidden peer"
-                onChange={toggleRole}
-                checked={formData.role === "admin"}
-              />
-              <span className="px-4 py-2 rounded-l-md text-white dark:bg-emerald-600 peer-checked:dark:bg-gray-200 peer-checked:text-black transition-colors duration-300">
-                Volunteer
-              </span>
-              <span className="px-4 py-2 rounded-r-md text-black dark:bg-gray-200 peer-checked:dark:bg-emerald-600 peer-checked:text-white transition-colors duration-300">
-                Admin
-              </span>
-            </label>
+              Volunteer
+            </button>
+            <button
+              onClick={() => handleRoleChange("admin")}
+              className={`px-4 py-2 rounded-r-md ${formData.role === "admin" ? "bg-emerald-600 text-white" : "bg-gray-200 text-black cursor-pointer"}`}
+            >
+              Admin
+            </button>
           </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">{error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your email
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Your email</label>
               <input
                 type="email"
                 name="email"
@@ -219,10 +193,7 @@ function Signup() {
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link to="/login" className="text-emerald-700 hover:underline">
-              Sign in
-            </Link>
+            Already have an account? <Link to="/login" className="text-emerald-700 hover:underline">Sign in</Link>
           </p>
         </div>
       </div>
