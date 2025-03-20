@@ -1,7 +1,12 @@
 require("dotenv").config(); 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 const uri = process.env.MONGO_URI;
+
+console.log(uri);
 
 if (!uri) {
   console.error("MONGO_URI is not defined! Check your .env file.");

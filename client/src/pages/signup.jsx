@@ -4,28 +4,29 @@ import axios from "axios";
 
 function Signup() {
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
     confirmPassword: "",
     termsAgreed: false,
-    role: "user" // Default role set to user
+    role: "volunteer", // Default role set to volunteer
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const toggleRole = () => {
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      role: prevState.role === "user" ? "admin" : "user"
+      role: prevState.role === "volunteer" ? "admin" : "volunteer",
     }));
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -45,18 +46,15 @@ function Signup() {
     setError("");
 
     // Validation checks
-    if (!formData.name.trim()) {
-      setError("Name is required");
-      return;
-    }
-
     if (!validateEmail(formData.email)) {
       setError("Invalid email format");
       return;
     }
 
     if (!validatePassword(formData.password)) {
-      setError("Password must be at least 8 characters long and contain uppercase, lowercase, and number");
+      setError(
+        "Password must be at least 8 characters long and contain uppercase, lowercase, and number"
+      );
       return;
     }
 
@@ -71,15 +69,19 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/signup', {
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        role: formData.role // Include role in the signup request
-      });
+      const response = await axios.post(
+        "http://localhost:5001/api/auth/signup",
+        {
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          role: formData.role, // Include role in the signup request
+        }
+      );
 
       console.log(response.data);
-      navigate('/login'); 
+
+      navigate("/email-validate", { state: { email: formData.email } });
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
     }
@@ -95,7 +97,10 @@ function Signup() {
           </h2>
 
           <div className="flex items-center justify-center mb-6">
-            <label htmlFor="Toggle3" className="inline-flex items-center p-2 rounded-md cursor-pointer">
+            <label
+              htmlFor="Toggle3"
+              className="inline-flex items-center p-2 rounded-md cursor-pointer"
+            >
               <input
                 id="Toggle3"
                 type="checkbox"
@@ -104,7 +109,7 @@ function Signup() {
                 checked={formData.role === "admin"}
               />
               <span className="px-4 py-2 rounded-l-md text-white dark:bg-emerald-600 peer-checked:dark:bg-gray-200 peer-checked:text-black transition-colors duration-300">
-                User
+                Volunteer
               </span>
               <span className="px-4 py-2 rounded-r-md text-black dark:bg-gray-200 peer-checked:dark:bg-emerald-600 peer-checked:text-white transition-colors duration-300">
                 Admin
@@ -119,21 +124,6 @@ function Signup() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Rest of the form remains the same */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="John Doe"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Your email
@@ -152,28 +142,54 @@ function Signup() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="**********"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="**********"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <span className="text-gray-500">Hide</span>
+                  ) : (
+                    <span className="text-gray-500">Show</span>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
               </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="**********"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="**********"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <span className="text-gray-500">Hide</span>
+                  ) : (
+                    <span className="text-gray-500">Show</span>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between mb-6">
