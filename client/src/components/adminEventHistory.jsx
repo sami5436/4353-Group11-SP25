@@ -254,27 +254,7 @@ const EventHistory = () => {
       longitude: event.longitude || -98.5795 + index * 0.5,
     }));
 
-    return (
-<LoadScript googleMapsApiKey="AIzaSyBNl1aAfBwzKsNFnjnSXpMiQ7Z-gh_x45U">
-<GoogleMap
-          mapContainerStyle={containerStyle}
-          center={defaultCenter}
-          zoom={4}
-        >
-          {eventsWithCoordinates.map((event, index) => (
-            <Marker
-              key={index}
-              position={{
-                lat: parseFloat(event.latitude),
-                lng: parseFloat(event.longitude),
-              }}
-              label={event.eventName[0]}
-              onClick={() => handleEventClick(event)}
-            />
-          ))}
-        </GoogleMap>
-      </LoadScript>
-    );
+
   };
 
   return (

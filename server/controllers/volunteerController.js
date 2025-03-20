@@ -42,7 +42,7 @@ const getEventsByVolunteerId = async (req, res) => {
     }
     
     const eventsCollection = db.collection("events");
-    const volunteersCollection = db.collection("volunteers");
+    const volunteersCollection = db.collection("users");
     
     // First, check if the volunteer exists
     const volunteer = await volunteersCollection.findOne({ _id: objectId });
