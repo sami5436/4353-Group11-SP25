@@ -1,12 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, Calendar, ClipboardList, LogOut, BarChart2 } from "lucide-react";
 import NotificationDropdown from "./notificationDropdown";
 import { useProfile } from "../context/adminProfileContext";
+import Cookies from "js-cookie"; // Import js-cookie
 
 function AdminNavbar() {
   const { profileData } = useProfile();
   const fullySignedUp = profileData.fullySignedUp;
+  const navigate = useNavigate(); // Use for redirection
+
+  const handleLogout = () => {
+    Cookies.remove("userId"); // Delete the cookie
+    console.log("User ID cookie deleted");
+    navigate("/"); // Redirect to home page after logout
+  };
 
   return (
     <div className="w-64 bg-gradient-to-b from-emerald-900 to-emerald-600 text-white h-screen fixed top-0 left-0">
@@ -57,18 +65,18 @@ function AdminNavbar() {
                 <BarChart2 size={20} />
                 <span>Events Report</span>
               </Link>
-          </>
+            </>
           ) : (
             <p className="text-sm text-gray-300">Complete your profile to unlock features.</p>
           )}
 
-          <Link
-            to="/logout"
-            className="flex items-center space-x-2 text-gray-300 hover:text-white"
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 text-gray-300 hover:text-white w-full text-left"
           >
             <LogOut size={20} />
             <span>Logout</span>
-          </Link>
+          </button>
         </nav>
       </div>
     </div>

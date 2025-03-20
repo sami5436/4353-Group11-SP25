@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie"; // Import js-cookie
 
-function login() {
+function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -12,9 +13,9 @@ function login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -22,18 +23,24 @@ function login() {
     e.preventDefault();
     setError("");
 
-    // Basic validation
     if (!formData.email.trim() || !formData.password.trim()) {
       setError("Please fill in all fields");
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/login', {
+      const response = await axios.post("http://localhost:5001/api/auth/login", {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
+      if (response.data && response.data.userId) {
+        // Store ObjectId in a Cookie
+        Cookies.set("userId", response.data.userId, { expires: 7, path: "/" }); // Expires in 7 days
+        console.log("User ID stored in cookie:", response.data.userId);
+      }
+
+      // Redirect user
       navigate(response.data.redirectPath);
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
@@ -84,22 +91,6 @@ function login() {
               />
             </div>
 
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-emerald-500 focus:ring-emerald-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 text-sm text-gray-600">
-                  Remember me
-                </label>
-              </div>
-
-              <a href="#" className="text-sm text-emerald-700 hover:underline">
-                Forgot password?
-              </a>
-            </div>
-
             <button
               type="submit"
               className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition duration-300 cursor-pointer"
@@ -120,4 +111,4 @@ function login() {
   );
 }
 
-export default login;
+export default Login;

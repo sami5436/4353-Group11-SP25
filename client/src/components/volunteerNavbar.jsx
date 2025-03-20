@@ -1,9 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Home, ClipboardList, Calendar, LogOut } from "lucide-react";
 import NotificationDropdown from "./notificationDropdown";
+import Cookies from "js-cookie"; // Import js-cookie
 
 function VolunteerNavbar() {
+  const navigate = useNavigate(); // Use navigate for redirect
+
+  const handleLogout = () => {
+    Cookies.remove("userId"); // Delete the cookie
+    console.log("User ID cookie deleted");
+    navigate("/"); // Redirect to home page after logout
+  };
+
   return (
     <div className="w-64 bg-gradient-to-b from-emerald-900 to-emerald-600 text-white h-screen fixed top-0 left-0">
       <div className="p-4 flex items-center space-x-2">
@@ -28,8 +37,6 @@ function VolunteerNavbar() {
             <span>My Profile</span>
           </Link>
 
-
-
           <Link
             to="/volunteer/assignments"
             className="flex items-center space-x-2 text-gray-300 hover:text-white"
@@ -45,13 +52,13 @@ function VolunteerNavbar() {
             <span>Volunteer History</span>
           </Link>
 
-          <Link
-            to="/"
-            className="flex items-center space-x-2 text-gray-300 hover:text-white"
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 text-gray-300 hover:text-white w-full text-left"
           >
             <LogOut size={20} />
             <span>Logout</span>
-          </Link>
+          </button>
         </nav>
       </div>
     </div>
