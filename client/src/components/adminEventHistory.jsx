@@ -31,6 +31,7 @@ const EventHistory = () => {
         street: event.address,
         city: event.city,
         state: event.state,
+        zipCode: event.zipCode || "", // Add zipCode field with default empty string
         status: event.status,
         urgency: event.urgency || "Medium", // Default if not provided
         skills: event.skills || [], // Ensure skills is always an array
@@ -50,6 +51,7 @@ const EventHistory = () => {
     street: "",
     city: "",
     state: "",
+    zipCode: "", // Add zipCode field to the new event template
     status: "Upcoming",
     urgency: "Medium",
     skills: [],
@@ -98,6 +100,7 @@ const EventHistory = () => {
       "street",
       "city",
       "state",
+      "zipCode", // Add zipCode to required fields
       "status",
       "urgency",
     ];
@@ -128,6 +131,7 @@ const EventHistory = () => {
         date: editedEvent.date,
         city: editedEvent.city,
         state: editedEvent.state,
+        zipCode: editedEvent.zipCode, // Add zipCode to eventData
         address: editedEvent.street,
         status: editedEvent.status,
         urgency: editedEvent.urgency,
@@ -283,6 +287,7 @@ const EventHistory = () => {
                 <th className="p-3 text-left">Street</th>
                 <th className="p-3 text-left">City</th>
                 <th className="p-3 text-left">State</th>
+                <th className="p-3 text-left">Zip Code</th>
                 <th className="p-3 text-left">Status</th>
                 <th className="p-3 text-left">Volunteers</th>
               </tr>
@@ -299,6 +304,7 @@ const EventHistory = () => {
                   <td className="p-3">{event.street}</td>
                   <td className="p-3">{event.city}</td>
                   <td className="p-3">{event.state}</td>
+                  <td className="p-3">{event.zipCode}</td>
                   <td
                     className={`p-3 ${
                       event.status === "Completed"
@@ -422,6 +428,22 @@ const EventHistory = () => {
                   />
                   {errors.state && (
                     <p className="text-red-500 text-sm">{errors.state}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Zip Code
+                  </label>
+                  <input
+                    type="text"
+                    value={editedEvent.zipCode}
+                    onChange={(e) => handleEventChange("zipCode", e.target.value)}
+                    className={`w-full px-3 py-2 border ${
+                      errors.zipCode ? "border-red-500" : "border-gray-300"
+                    } rounded-md`}
+                  />
+                  {errors.zipCode && (
+                    <p className="text-red-500 text-sm">{errors.zipCode}</p>
                   )}
                 </div>
 

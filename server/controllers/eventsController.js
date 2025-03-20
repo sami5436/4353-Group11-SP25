@@ -17,9 +17,9 @@ const getVolunteerHistory = async (req, res) => {
 
 // Add a new event 
 const addEvent = async (req, res) => {
-  const { name, date, city, state, address, status, description, skills } = req.body;
+  const { name, date, city, state, zipCode, address, status, description, skills } = req.body;
 
-  if (!name || !date || !city || !state || !address || !status || !description) {
+  if (!name || !date || !city || !state || !zipCode || !address || !status || !description) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -28,6 +28,7 @@ const addEvent = async (req, res) => {
     date,
     city,
     state,
+    zipCode,
     address,
     status,
     description,
@@ -43,7 +44,6 @@ const addEvent = async (req, res) => {
     res.status(500).json({ message: "Error adding event", error });
   }
 };
-
 
 
 
