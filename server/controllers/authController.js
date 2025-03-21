@@ -1,13 +1,15 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const connectDB = require("../db");
 
 let db;
 // Initialize database connection
-connectDB().then(database => {
-  db = database;
-}).catch(err => {
-  console.error("Failed to connect to database:", err);
-});
+connectDB()
+  .then((database) => {
+    db = database;
+  })
+  .catch((err) => {
+    console.error("Failed to connect to database:", err);
+  });
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,29 +26,30 @@ const signup = async (req, res) => {
 
   try {
     if (!email || !password || !confirmPassword) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ error: "All fields are required" });
     }
 
     if (!validateEmail(email)) {
-      return res.status(400).json({ error: 'Invalid email format' });
+      return res.status(400).json({ error: "Invalid email format" });
     }
 
     if (!validatePassword(password)) {
-      return res.status(400).json({ 
-        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, and number' 
+      return res.status(400).json({
+        error:
+          "Password must be at least 8 characters long and contain uppercase, lowercase, and number",
       });
     }
 
     if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
+      return res.status(400).json({ error: "Passwords do not match" });
     }
 
     // Check if user already exists
-    const usersCollection = db.collection('users');
+    const usersCollection = db.collection("users");
     const existingUser = await usersCollection.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already in use' });
+      return res.status(400).json({ error: "Email already in use" });
     }
 
     // Hash the password
@@ -54,8 +57,8 @@ const signup = async (req, res) => {
 
     // Create user based on role
     let newUser;
-    
-    if (role === 'admin') {
+
+    if (role === "admin") {
       newUser = {
         fullName: "",
         email,
@@ -64,7 +67,7 @@ const signup = async (req, res) => {
         emergencyPhone: "",
         fullySignedUp: false,
         password: hashedPassword,
-        userType: 'admin'
+        userType: "admin",
       };
     } else {
       // Default to volunteer
@@ -86,22 +89,22 @@ const signup = async (req, res) => {
         skills: [],
         availability: [],
         preferences: "",
-        userType: 'volunteer',
+        userType: "volunteer",
         password: hashedPassword,
-        fullySignedUp: "false"
+        fullySignedUp: "false",
       };
     }
 
     const result = await usersCollection.insertOne(newUser);
 
-    res.status(201).json({ 
-      message: 'User registered successfully',
+    res.status(201).json({
+      message: "User registered successfully",
       userId: result.insertedId,
-      role: role || 'volunteer'
+      role: role || "volunteer",
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Signup error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -110,40 +113,41 @@ const login = async (req, res) => {
 
   try {
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
     // Find the user
-    const usersCollection = db.collection('users');
+    const usersCollection = db.collection("users");
     const user = await usersCollection.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     // Determine redirect path based on user type
-    const redirectPath = user.userType === 'admin' ? '/admin/profile' : '/volunteer/profile';
+    const redirectPath =
+      user.userType === "admin" ? "/admin/profile" : "/volunteer/profile";
 
-    res.status(200).json({ 
-      message: 'Login successful', 
+    res.status(200).json({
+      message: "Login successful",
       userId: user._id,
       userType: user.userType,
-      redirectPath: redirectPath
+      redirectPath: redirectPath,
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 module.exports = {
   signup,
-  login
+  login,
 };
