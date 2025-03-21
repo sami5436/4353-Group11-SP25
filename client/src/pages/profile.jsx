@@ -152,7 +152,7 @@ function Profile() {
       <VolunteerNavbar />
       
       <div className="flex-1 ml-64 p-8">
-        <h1 className="text-3xl font-bold mb-6">Hello, {profileData.firstName}!</h1>
+        <h1 className="text-3xl font-bold mb-6">Hello{profileData.firstName ? `, ${profileData.firstName}` : ''}!</h1>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
@@ -269,7 +269,7 @@ function Profile() {
             </div>
 
             {/* Location Information Section */}
-            <h3 className="text-lg font-semibold mt-6">Location Information</h3>
+            <h3 className="text-lg font-semibold mt-6">Address Information</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
               <input

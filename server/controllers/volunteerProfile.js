@@ -41,9 +41,22 @@ const updateVolunteerProfile = async (req, res) => {
     const { _id, ...updateObject } = req.body; // Exclude _id from the update object and Start with the incoming data
 
     // Check if required fields are filled to set fullySignedUp
-    const requiredFieldsFilled = updatedData.firstName && updatedData.lastName && updatedData.email && updatedData.phone && updatedData.dateOfBirth && updatedData.gender && updatedData.address1 && updatedData.city1 && updatedData.state1 && updatedData.zipCode1;
-
-    updateObject.fullySignedUp = requiredFieldsFilled; // Set fullySignedUp based on filled fields
+    const requiredFields = [
+      updatedData.firstName,
+      updatedData.lastName,
+      updatedData.email,
+      updatedData.phone,
+      updatedData.dateOfBirth,
+      updatedData.gender,
+      updatedData.address1,
+      updatedData.city1,
+      updatedData.state1,
+      updatedData.zipCode1
+    ];
+    
+    const requiredFieldsFilled = requiredFields.every(field => Boolean(field)); // Check if all fields are truthy
+    
+    updateObject.fullySignedUp = requiredFieldsFilled;
 
     // Step 4: Update the Database
     const result = await db.collection("users").updateOne(
