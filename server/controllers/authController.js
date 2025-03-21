@@ -84,7 +84,7 @@ const signup = async (req, res) => {
         state2: "",
         zipCode2: "",
         skills: [],
-        availability: "",
+        availability: [],
         preferences: "",
         userType: 'volunteer',
         password: hashedPassword,
