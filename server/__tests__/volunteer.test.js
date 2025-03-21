@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../server"); 
+const app = require("../server");
 const connectDB = require("../db");
 const { ObjectId } = require("mongodb");
 
@@ -16,36 +16,53 @@ afterAll(async () => {
   if (client) await client.close();
 });
 
-it("should return all events associated with a valid volunteer ID", async () => {
-    // Insert a test volunteer
-    const volunteerId = new ObjectId();
-    await db.collection("users").insertOne({
-      _id: volunteerId,
-      name: "Test Volunteer",
-      zipCode: "12345",
-      skills: ["medical", "logistics"],
-      availability: "2025-06-01",
-    });
-  
-    // Insert related events
-    await db.collection("events").insertMany([
-      {
-        name: "Beach Cleanup",
-        volunteers: [volunteerId.toString()],
-        status: "Upcoming",
-      },
-      {
-        name: "Park Maintenance",
-        volunteers: [volunteerId.toString()],
-        status: "Completed",
-      },
-    ]);
-  
-    const res = await request(app).get(`/api/volunteers/volunteer/${volunteerId}`);
-  
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBe(2);
-    expect(res.body.every(event => event.volunteered === true)).toBe(true);
+describe("getEventsByID", () => {
+  const testingID = "67dcfcf2b7002f35f9a9a446";
+
+  test("If no events found for this volunteer, should return 404", async () => {
+    const nonExistentId = new ObjectId();
+    const response = await request(app).get(
+      `/api/volunteers/volunteer/${nonExistentId}`
+    );
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe("No events found for this volunteer");
   });
-  
+
+  test("should return assigned events", async () => {
+    const response = await request(app).get(
+      `/api/volunteers/volunteer/${testingID}`
+    );
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0].name).toBe("For volunteer.test.js");
+  });
+});
+
+describe("getUpcomingEventsByID", () => {
+  const testingID = "67dcfcf2b7002f35f9a9a446";
+
+  test("If no events found for this volunteer, should return 404", async () => {
+    const nonExistentId = new ObjectId();
+    const response = await request(app).get(
+      `/api/volunteers/volunteer/${nonExistentId}`
+    );
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe("No events found for this volunteer");
+  });
+
+  test("should return assigned events which contain upcoming field", async () => {
+    const response = await request(app).get(
+      `/api/volunteers/volunteer/${testingID}/upcoming`
+    );
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0].name).toBe("For volunteer.test.js");
+    expect(response.body[0].status).toBe("Upcoming");
+  });
+});
