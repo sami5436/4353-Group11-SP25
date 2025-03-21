@@ -119,6 +119,9 @@ function Profile() {
       setProfileData(response.data.volunteerProfile);
       setIsEditing(false);
       setErrors([]);
+
+      await axios.post(`http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`);
+
     } catch (error) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
