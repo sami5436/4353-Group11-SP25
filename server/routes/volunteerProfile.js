@@ -7,7 +7,7 @@ const validateVolunteerProfile = require("../middleware/validateVolunteerProfile
 router.get('/volunteer/:id', getVolunteerProfile);
 
 // Update user profile
-// router.put('/volunteer/:id', validateVolunteerProfile, updateVolunteerProfile); // Updated route to include volunteerId
+router.put('/volunteer/:id', validateVolunteerProfile, updateVolunteerProfile); // Updated route to include volunteerId
 
 module.exports = router;
 

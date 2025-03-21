@@ -113,8 +113,9 @@ function Profile() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const volunteerId = Cookies.get("userId"); // Retrieve the volunteer ID
     try {
-      const response = await axios.put("http://localhost:5001/api/volunteerProfile", editedData);
+      const response = await axios.put(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`, editedData);
       setProfileData(response.data.volunteerProfile);
       setIsEditing(false);
       setErrors([]);
