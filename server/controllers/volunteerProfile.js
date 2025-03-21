@@ -1,27 +1,30 @@
-// In-memory storage for the volunteer profile
-let volunteerProfile = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  dateOfBirth: "",
-  gender: "",
-  address1: "",
-  city1: "",
-  state1: "",
-  zipCode1: "",
-  address2: "",
-  city2: "",
-  state2: "",
-  zipCode2: "",
-  skills: [],
-  availability: "",
-  preferences: ""
+// Mock data for testing
+const volunteerProfiles = {
+"67dce803db4ecdec059f7297": { firstName: "Diana", lastName: "Nguyen", email: "diana_test1@volunteer.com" },
+"456": { firstName: "Jane", lastName: "Smith", email: "jane@example.com" },
 };
 
-// GET request handler to retrieve the volunteer profile
-const getVolunteerProfile = (req, res) => {
-  res.json(volunteerProfile); // Respond with the current volunteer profile
+const getVolunteerProfile = async (req, res) => {
+  console.log("inside controller")
+  const volunteerId = req.params.id; // Get user ID from request parameters
+  console.log("Retrieved volunteer ID:", volunteerId); // Log the volunteer ID
+
+  // Check if the volunteerId exists in the mock data
+  if (volunteerProfiles[volunteerId]) {
+    console.log("ID is in mock data"); // Log if the ID exists
+  } else {
+    console.log("ID is NOT in mock data"); // Log if the ID does not exist
+  }
+
+  // Use mock data instead of actual DB call
+  const profile = volunteerProfiles[volunteerId]; // Replace with actual DB call
+  console.log("Fetched profile:", profile); // Log the fetched profile
+
+  if (!profile) {
+    return res.status(404).json({ message: "Profile not found" });
+  }
+
+  res.json(profile); // Respond with the current volunteer profile
 };
 
 // PUT request handler to update the volunteer profile

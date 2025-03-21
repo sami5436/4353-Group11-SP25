@@ -5,6 +5,7 @@ import CreatableSelect from 'react-select/creatable';
 import axios from "axios";
 import DatePicker from "react-multi-date-picker";
 import "../styles/volunteerProfileAvailabilityStyling.css"; // Import the custom green theme
+import Cookies from "js-cookie";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -72,9 +73,12 @@ function Profile() {
   }));
 
   useEffect(() => {
+    const volunteerId = Cookies.get("userId");
+    console.log("profile.jsx: Volunteer ID from cookie:", volunteerId); // Log the volunteer ID
     const fetchProfileData = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/volunteerProfile");
+        const response = await axios.get(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`);
+        console.log("Profile data fetched:", response.data); // Log the response data
         setProfileData(response.data);
         setEditedData(response.data);
 
@@ -417,7 +421,7 @@ function Profile() {
                 isMulti
                 isDisabled={!isEditing}
                 value={skillSelectOptions.filter(option => 
-                  (isEditing ? editedData.skills : profileData.skills).includes(option.value)
+                  (isEditing ? editedData.skills : (profileData.skills || [])).includes(option.value)
                 )}
                 onChange={(selectedOptions) => setEditedData({
                   ...editedData,
