@@ -1,9 +1,25 @@
 const request = require("supertest");
 const app = require("../server");
+const connectDB = require("../db");
+const { ObjectId } = require("mongodb");
+
+let db;
+let client;
+
+beforeAll(async () => {
+  const connection = await connectDB();
+  client = connection.client;
+  db = connection.db;
+});
+
+afterAll(async () => {
+  if (client) await client.close();
+});
 
 describe("Admin Profile API", () => {
   it("should fetch admin profile data", async () => {
     const res = await request(app).get("/api/adminProfile");
+
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("fullName");
     expect(res.body).toHaveProperty("adminId");
@@ -16,10 +32,12 @@ describe("Admin Profile API", () => {
       email: "john.smith@example.com",
       phone: "123-456-7890",
       emergencyContact: "Jane Smith",
-      emergencyPhone: "111-222-3333"
+      emergencyPhone: "111-222-3333",
     };
 
-    const res = await request(app).put("/api/adminProfile").send(updatedProfile);
+    const res = await request(app)
+      .put("/api/adminProfile")
+      .send(updatedProfile);
     expect(res.statusCode).toBe(200);
     expect(res.body.fullName).toBe(updatedProfile.fullName);
     expect(res.body.email).toBe(updatedProfile.email);
@@ -28,10 +46,12 @@ describe("Admin Profile API", () => {
   it("should not update with invalid data", async () => {
     const invalidProfile = {
       fullName: "",
-      email: "not-an-email"
+      email: "not-an-email",
     };
 
-    const res = await request(app).put("/api/adminProfile").send(invalidProfile);
+    const res = await request(app)
+      .put("/api/adminProfile")
+      .send(invalidProfile);
     expect(res.statusCode).toBe(400);
   });
 });
