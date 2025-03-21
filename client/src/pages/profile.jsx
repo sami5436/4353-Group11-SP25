@@ -5,6 +5,7 @@ import CreatableSelect from 'react-select/creatable';
 import axios from "axios";
 import DatePicker from "react-multi-date-picker";
 import "../styles/volunteerProfileAvailabilityStyling.css"; // Import the custom green theme
+import Cookies from "js-cookie";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -72,9 +73,12 @@ function Profile() {
   }));
 
   useEffect(() => {
+    const volunteerId = Cookies.get("userId");
+    console.log("profile.jsx: Volunteer ID from cookie:", volunteerId); // Log the volunteer ID
     const fetchProfileData = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/volunteerProfile");
+        const response = await axios.get(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`);
+        console.log("Profile data fetched:", response.data); // Log the response data
         setProfileData(response.data);
         setEditedData(response.data);
 
@@ -109,8 +113,9 @@ function Profile() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const volunteerId = Cookies.get("userId"); // Retrieve the volunteer ID
     try {
-      const response = await axios.put("http://localhost:5001/api/volunteerProfile", editedData);
+      const response = await axios.put(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`, editedData);
       setProfileData(response.data.volunteerProfile);
       setIsEditing(false);
       setErrors([]);
@@ -147,7 +152,7 @@ function Profile() {
       <VolunteerNavbar />
       
       <div className="flex-1 ml-64 p-8">
-        <h1 className="text-3xl font-bold mb-6">Hello, {profileData.firstName}!</h1>
+        <h1 className="text-3xl font-bold mb-6">Hello{profileData.firstName ? `, ${profileData.firstName}` : ''}!</h1>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
@@ -264,7 +269,7 @@ function Profile() {
             </div>
 
             {/* Location Information Section */}
-            <h3 className="text-lg font-semibold mt-6">Location Information</h3>
+            <h3 className="text-lg font-semibold mt-6">Address Information</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
               <input
@@ -417,7 +422,7 @@ function Profile() {
                 isMulti
                 isDisabled={!isEditing}
                 value={skillSelectOptions.filter(option => 
-                  (isEditing ? editedData.skills : profileData.skills).includes(option.value)
+                  (isEditing ? editedData.skills : (profileData.skills || [])).includes(option.value)
                 )}
                 onChange={(selectedOptions) => setEditedData({
                   ...editedData,

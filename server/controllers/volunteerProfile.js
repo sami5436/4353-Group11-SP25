@@ -1,71 +1,85 @@
-// In-memory storage for the volunteer profile
-let volunteerProfile = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  dateOfBirth: "",
-  gender: "",
-  address1: "",
-  city1: "",
-  state1: "",
-  zipCode1: "",
-  address2: "",
-  city2: "",
-  state2: "",
-  zipCode2: "",
-  skills: [],
-  availability: "",
-  preferences: ""
+const { ObjectId } = require("mongodb");
+const connectDB = require("../db");
+
+// Step 1: Extract volunteerId
+const getVolunteerProfile = async (req, res) => {
+  const volunteerId = req.params.id; // Extracting volunteerId from request parameters
+  console.log("Extracted Volunteer ID:", volunteerId); // Log the volunteer ID for debugging
+
+  // Step 2: Connect to the Database
+  try {
+    const db = await connectDB(); // Attempt to connect to the database
+    console.log("Database connection successful!"); // Log success message
+
+    // Step 3: Query the Database
+    const volunteerProfile = await db.collection("users").findOne({ _id: new ObjectId(volunteerId) });
+
+    // Step 4: Handle the Response
+    if (!volunteerProfile) {
+      return res.status(404).json({ message: "Volunteer not found" }); // Return 404 if not found
+    }
+
+    res.json(volunteerProfile); // Return the volunteer profile data
+  } catch (error) {
+    console.error("Error retrieving volunteer profile:", error); // Log any errors
+    return res.status(500).json({ message: "Error retrieving volunteer profile", error: error.message }); // Return error response
+  }
 };
 
-// GET request handler to retrieve the volunteer profile
-const getVolunteerProfile = (req, res) => {
-  res.json(volunteerProfile); // Respond with the current volunteer profile
+// Step 1: Extract volunteerId
+const updateVolunteerProfile = async (req, res) => {
+  const volunteerId = req.params.id; // Extracting volunteerId from request parameters
+  console.log("updateVolunteer - Extracted Volunteer ID:", volunteerId); // Log the volunteer ID for debugging
+
+  // Step 2: Connect to the Database
+  try {
+    const db = await connectDB(); // Attempt to connect to the database
+    console.log("Database connection successful!"); // Log success message
+
+    // Step 3: Prepare the Update Object
+    const updatedData = req.body; // Get the updated data from the request body
+    const { _id, ...updateObject } = req.body; // Exclude _id from the update object and Start with the incoming data
+
+    // Check if required fields are filled to set fullySignedUp
+    const requiredFields = [
+      updatedData.firstName,
+      updatedData.lastName,
+      updatedData.email,
+      updatedData.phone,
+      updatedData.dateOfBirth,
+      updatedData.gender,
+      updatedData.address1,
+      updatedData.city1,
+      updatedData.state1,
+      updatedData.zipCode1
+    ];
+    
+    const requiredFieldsFilled = requiredFields.every(field => Boolean(field)); // Check if all fields are truthy
+    
+    updateObject.fullySignedUp = requiredFieldsFilled;
+
+    // Step 4: Update the Database
+    const result = await db.collection("users").updateOne(
+      { _id: new ObjectId(volunteerId) }, // Filter to find the correct volunteer
+      { $set: updateObject } // Update the document with the new data
+    );
+
+    // Step 5: Handle the Response
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "Volunteer not found or no changes made" }); // Handle case where no document was updated
+    }
+
+    res.status(200).json({ message: "Profile updated successfully", volunteerProfile: updateObject }); // Return success message
+  } catch (error) {
+    console.error("Error updating volunteer profile:", error); // Log any errors
+    return res.status(500).json({ message: "Error updating volunteer profile", error: error.message }); // Return error response
+  }
 };
 
-// PUT request handler to update the volunteer profile
-const updateVolunteerProfile = (req, res) => {
-  const { 
-    firstName, 
-    lastName, 
-    email, 
-    phone, 
-    dateOfBirth, 
-    gender, 
-    address1, 
-    city1, 
-    state1, 
-    zipCode1, 
-    address2, 
-    city2, 
-    state2, 
-    zipCode2, 
-    skills, 
-    availability,
-    preferences
-  } = req.body;
-
-  // Conditionally update fields if they are present in the request body
-  if (firstName !== undefined) volunteerProfile.firstName = firstName;
-  if (lastName !== undefined) volunteerProfile.lastName = lastName;
-  if (email !== undefined) volunteerProfile.email = email;
-  if (phone !== undefined) volunteerProfile.phone = phone;
-  if (dateOfBirth !== undefined) volunteerProfile.dateOfBirth = dateOfBirth;
-  if (gender !== undefined) volunteerProfile.gender = gender;
-  if (address1 !== undefined) volunteerProfile.address1 = address1;
-  if (city1 !== undefined) volunteerProfile.city1 = city1;
-  if (state1 !== undefined) volunteerProfile.state1 = state1;
-  if (zipCode1 !== undefined) volunteerProfile.zipCode1 = zipCode1;
-  if (address2 !== undefined) volunteerProfile.address2 = address2;
-  if (city2 !== undefined) volunteerProfile.city2 = city2;
-  if (state2 !== undefined) volunteerProfile.state2 = state2;
-  if (zipCode2 !== undefined) volunteerProfile.zipCode2 = zipCode2;
-  if (skills !== undefined) volunteerProfile.skills = skills;
-  if (availability !== undefined) volunteerProfile.availability = availability;
-  if (preferences !== undefined) volunteerProfile.preferences = preferences;
-
-  res.status(200).json({ message: "Profile updated successfully", volunteerProfile });
+// Export the controller functions
+module.exports = {
+  updateVolunteerProfile,
+  // other functions...
 };
 
 // Export the controller functions
