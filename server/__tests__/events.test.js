@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../server");
 
 describe("Event fetcher API for volunteer history", () => {
-  
   it("should return all events", async () => {
     const res = await request(app).get("/api/events/history");
     expect(res.statusCode).toBe(200);
@@ -12,16 +11,16 @@ describe("Event fetcher API for volunteer history", () => {
 
   it("should add a new event", async () => {
     const newEvent = {
-      name: "Test Event",
+      name: "deleteThis",
       date: "2024-06-01",
-      city: "Test City",
+      city: "delete city",
       state: "TX",
-      address: "789 Test St",
+      address: "789 delete St",
       status: "Upcoming",
-      description: "A test event for validation",
+      description: "An event for tests, delete it",
       volunteered: false,
-      volunteers: [], // Ensure volunteers array is initialized
-      skills: ["First Aid & CPR", "Public Speaking"], // Ensure skills are included
+      volunteers: [],
+      skills: ["Deleting tests lol"],
     };
 
     const res = await request(app).post("/api/events").send(newEvent);
@@ -34,7 +33,7 @@ describe("Event fetcher API for volunteer history", () => {
     const invalidEvent = {
       name: "Incomplete Event",
       city: "Test City",
-      skills: [], // Ensuring that an empty array doesn't break validation
+      skills: [],
     };
 
     const res = await request(app).post("/api/events").send(invalidEvent);
@@ -73,7 +72,9 @@ describe("Event fetcher API for volunteer history", () => {
       volunteerEmail: "johndoe@example.com",
     };
 
-    const volunteerRes = await request(app).post("/api/events/addVolunteer").send(newVolunteer);
+    const volunteerRes = await request(app)
+      .post("/api/events/addVolunteer")
+      .send(newVolunteer);
     expect(volunteerRes.statusCode).toBe(201);
     expect(volunteerRes.body.name).toBe(newVolunteer.volunteerName);
   });
@@ -83,17 +84,19 @@ describe("Volunteer History API - Additional Test Cases", () => {
 
   beforeAll(async () => {
     // Create an event to update later
-    const eventRes = await request(app).post("/api/events").send({
-      name: "Test Update Event",
-      date: "2024-07-01",
-      city: "Test City",
-      state: "TX",
-      address: "123 Test Ave",
-      status: "Upcoming",
-      description: "Event for testing update functionality",
-      volunteered: false,
-      skills: ["Organization", "Leadership"],
-    });
+    const eventRes = await request(app)
+      .post("/api/events")
+      .send({
+        name: "Test Update Event",
+        date: "2024-07-01",
+        city: "Test City",
+        state: "TX",
+        address: "123 Test Ave",
+        status: "Upcoming",
+        description: "Event for testing update functionality",
+        volunteered: false,
+        skills: ["Organization", "Leadership"],
+      });
     eventId = eventRes.body.id;
   });
 
@@ -103,7 +106,9 @@ describe("Volunteer History API - Additional Test Cases", () => {
       status: "Completed",
     };
 
-    const res = await request(app).put(`/api/events/${eventId}`).send(updatedEvent);
+    const res = await request(app)
+      .put(`/api/events/${eventId}`)
+      .send(updatedEvent);
     expect(res.statusCode).toBe(200);
     expect(res.body.name).toBe(updatedEvent.name);
     expect(res.body.status).toBe(updatedEvent.status);
@@ -124,7 +129,9 @@ describe("Volunteer History API - Additional Test Cases", () => {
       volunteerEmail: "jane@example.com",
     };
 
-    const res = await request(app).post("/api/events/addVolunteer").send(newVolunteer);
+    const res = await request(app)
+      .post("/api/events/addVolunteer")
+      .send(newVolunteer);
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Event not found");
   });
