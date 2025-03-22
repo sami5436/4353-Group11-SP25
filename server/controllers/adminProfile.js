@@ -10,7 +10,7 @@ const getAdminProfile = async (req, res) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: No user ID found in cookies get" });
     }
-
+    
     const adminsCollection = db.collection("users");
     const admin = await adminsCollection.findOne({ _id: new ObjectId(userId) });
 
