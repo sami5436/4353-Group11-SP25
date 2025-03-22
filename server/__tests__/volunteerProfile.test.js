@@ -1,9 +1,27 @@
 const request = require("supertest");
 const app = require("../server");
+const connectDB = require("../db");
+
+let db;
+let client;
+
+beforeAll(async () => {
+  const connection = await connectDB();
+  client = connection.client;
+  db = connection.db;
+});
+
+afterAll(async () => {
+  if (client) await client.close();
+});
+
 
 describe("Volunteer Profile API", () => {
+  // Using a sample volunteer ID for testing
+  const testVolunteerId = "validVolunteerId"; // Replace with a valid MongoDB ObjectId in your test database
+  
   it("should fetch the volunteer profile", async () => {
-    const res = await request(app).get("/api/volunteerProfile");
+    const res = await request(app).get(`/api/volunteerProfile/volunteer/${testVolunteerId}`);
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("firstName");
     expect(res.body).toHaveProperty("lastName");
@@ -17,6 +35,7 @@ describe("Volunteer Profile API", () => {
       email: "jane.doe@example.com",
       phone: "123-456-7890",
       dateOfBirth: "1990-01-01",
+      gender: "female",
       address1: "123 Main St",
       city1: "Anytown",
       state1: "CA",
@@ -26,11 +45,11 @@ describe("Volunteer Profile API", () => {
       state2: "CA",
       zipCode2: "67890",
       skills: ["First Aid", "Teaching"],
-      availability: "Weekends",
+      availability: ["2023-01-01", "2023-01-02"],
       preferences: "Remote work"
     };
 
-    const res = await request(app).put("/api/volunteerProfile").send(updatedProfile);
+    const res = await request(app).put(`/api/volunteerProfile/volunteer/${testVolunteerId}`).send(updatedProfile);
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe("Profile updated successfully");
     expect(res.body.volunteerProfile.firstName).toBe(updatedProfile.firstName);
@@ -42,13 +61,15 @@ describe("Volunteer Profile API", () => {
       lastName: "Doe",
       email: "invalid-email",
       phone: "123-456-7890",
+      dateOfBirth: "1990-01-01",
+      gender: "female",
       address1: "123 Main St",
       city1: "Anytown",
       state1: "CA",
       zipCode1: "12345"
     };
 
-    const res = await request(app).put("/api/volunteerProfile").send(invalidProfile);
+    const res = await request(app).put(`/api/volunteerProfile/volunteer/${testVolunteerId}`).send(invalidProfile);
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toContain("Email must be in a valid format (e.g., user@example.com).");
   });
@@ -62,7 +83,7 @@ describe("Volunteer Profile API", () => {
       // Missing required fields like address1, zipCode1, etc.
     };
 
-    const res = await request(app).put("/api/volunteerProfile").send(incompleteProfile);
+    const res = await request(app).put(`/api/volunteerProfile/volunteer/${testVolunteerId}`).send(incompleteProfile);
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toContain("All primary address fields are required.");
   });
@@ -72,14 +93,16 @@ describe("Volunteer Profile API", () => {
       firstName: "Jane",
       lastName: "Doe",
       email: "jane.doe@example.com",
+      phone: "123-456-7890",
       dateOfBirth: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Tomorrow's date
+      gender: "female",
       address1: "123 Main St",
       city1: "Anytown",
       state1: "CA",
       zipCode1: "12345"
     };
 
-    const res = await request(app).put("/api/volunteerProfile").send(futureProfile);
+    const res = await request(app).put(`/api/volunteerProfile/volunteer/${testVolunteerId}`).send(futureProfile);
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toContain("Date of birth cannot be in the future.");
   });
