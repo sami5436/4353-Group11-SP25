@@ -3,7 +3,7 @@ const { ObjectId } = require("mongodb");
 
 const assignVolunteer = async (req, res) => {
   const volunteerId = req.params.id;
-  const fallbackEventId = "67dce403deb657df9900d5a7";
+  const fallbackEventId = "67deab0b0f1bbc40a5d44d61";
   
   try {
     let objectId;
