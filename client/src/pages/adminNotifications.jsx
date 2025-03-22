@@ -2,29 +2,36 @@ import React, { useState, useEffect } from 'react';
 import AdminNavbar from '../components/adminNavbar';
 import { Check } from 'lucide-react';
 import axios from 'axios';
+import Cookies from "js-cookie";
 
 const AdminNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState('all');
-    
-    const adminId = "ADMIN-001";
+
     const recipientType = "admin";
 
     useEffect(() => {
-        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}&recipientId=${adminId}`;
+        const userId = Cookies.get("userId");
+        if (!userId) {
+            console.error("No user ID found in cookies");
+            return;
+        }
+
+        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}`;
         if (filter === 'unread') {
           url += '&unread=true';
         } else if (filter !== 'all') {
           url += `&type=${filter}`;
         }
         
-        axios.get(url)
+        axios.get(url, { withCredentials: true })
           .then(res => setNotifications(res.data))
           .catch(err => console.error("Error fetching notifications:", err));
     }, [filter]);
       
     const markAllAsRead = () => {
-        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}&recipientId=${adminId}`)
+        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}`, 
+            {}, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setNotifications(notifications.map(notif => ({ ...notif, read: true })));
@@ -35,7 +42,7 @@ const AdminNotifications = () => {
     };
 
     const markAsRead = (id) => {
-        axios.put(`http://localhost:5001/api/notifications/${id}/read`)
+        axios.put(`http://localhost:5001/api/notifications/${id}/read`, {}, { withCredentials: true })
             .then(res => {
                 setNotifications(notifications.map(notif =>
                     notif.notifId === parseInt(id) ? { ...notif, read: true } : notif

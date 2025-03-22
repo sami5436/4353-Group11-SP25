@@ -2,40 +2,47 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Check } from 'lucide-react';
+import Cookies from "js-cookie";
 
 const VolunteerNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [filter, setFilter] = useState('all');
     
-    const volunteerId = "VOL-001";
     const recipientType = "volunteer";
 
     useEffect(() => {
-        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}&recipientId=${volunteerId}`;
+        const userId = Cookies.get("userId");
+        if (!userId) {
+            console.error("No user ID found in cookies");
+            return;
+        }
+
+        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}`;
         if (filter === 'unread') {
-            url += '&unread=true';
+          url += '&unread=true';
         } else if (filter !== 'all') {
-            url += `&type=${filter}`;
+          url += `&type=${filter}`;
         }
         
-        axios.get(url)
-            .then(res => setNotifications(res.data))
-            .catch(err => console.error("Error fetching notifications:", err));
+        axios.get(url, { withCredentials: true })
+          .then(res => setNotifications(res.data))
+          .catch(err => console.error("Error fetching notifications:", err));
     }, [filter]);
 
     const markAllAsRead = () => {
-        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}&recipientId=${volunteerId}`)
+        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}`, 
+            {}, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
                     setNotifications(notifications.map(notif => ({ ...notif, read: true })));
-                    window.location.reload();
                 }
             })
             .catch(err => console.error("Error marking all notifications as read:", err));
+            window.location.reload();
     };
 
     const markAsRead = (id) => {
-        axios.put(`http://localhost:5001/api/notifications/${id}/read`)
+        axios.put(`http://localhost:5001/api/notifications/${id}/read`, {}, { withCredentials: true })
             .then(res => {
                 setNotifications(notifications.map(notif =>
                     notif.notifId === parseInt(id) ? { ...notif, read: true } : notif

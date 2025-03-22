@@ -6,7 +6,12 @@ connectDB().then((database) => (db = database));
 
 const getNotifications = async (req, res) => {
   try {
-    const { type, unread, recipientType, recipientId } = req.query;
+    const { type, unread, recipientType } = req.query;
+    const userId = req.cookies.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: No user ID found in cookies" });
+    }
 
     const query = {};
 
@@ -14,9 +19,7 @@ const getNotifications = async (req, res) => {
       query.recipientType = recipientType;
     }
 
-    if (recipientId) {
-      query.recipientId = recipientId;
-    }
+    query.recipientId = userId;
 
     if (type && type !== "all") {
       query.notificationType = type;
@@ -34,24 +37,36 @@ const getNotifications = async (req, res) => {
 
     res.json(notifications);
   } catch (error) {
-    // console.error("Error retrieving notifications:", error);
-    // res
-    //   .status(500)
-    //   .json({
-    //     message: "Error retrieving notifications",
-    //     error: error.message,
-    //   });
+    console.error("Error retrieving notifications:", error);
+    res.status(500).json({
+      message: "Error retrieving notifications",
+      error: error.message,
+    });
   }
 };
 
 const markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.cookies.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: No user ID found in cookies" });
+    }
 
     const notificationsCollection = db.collection("notifications");
 
+    const notification = await notificationsCollection.findOne({ 
+      notifId: parseInt(id),
+      recipientId: userId
+    });
+
+    if (!notification) {
+      return res.status(404).json({ error: "Notification not found or you don't have permission" });
+    }
+
     const result = await notificationsCollection.updateOne(
-      { notifId: parseInt(id) },
+      { notifId: parseInt(id), recipientId: userId },
       { $set: { read: true } }
     );
 
@@ -61,6 +76,7 @@ const markAsRead = async (req, res) => {
 
     const updatedNotification = await notificationsCollection.findOne({
       notifId: parseInt(id),
+      recipientId: userId
     });
 
     res.json(updatedNotification);
@@ -75,22 +91,20 @@ const markAsRead = async (req, res) => {
 
 const markAllAsRead = async (req, res) => {
   try {
-    const { recipientType, recipientId } = req.query;
+    const { recipientType } = req.query;
+    const userId = req.cookies.userId;
 
-    const query = { read: false };
-
-    if (!recipientType && !recipientId) {
-      return res
-        .status(400)
-        .json({ message: "Either recipientType or recipientId is required" });
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: No user ID found in cookies" });
     }
+
+    const query = { 
+      read: false,
+      recipientId: userId
+    };
 
     if (recipientType) {
       query.recipientType = recipientType;
-    }
-
-    if (recipientId) {
-      query.recipientId = recipientId;
     }
 
     const notificationsCollection = db.collection("notifications");

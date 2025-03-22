@@ -2,24 +2,31 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
+import Cookies from "js-cookie";
 
 const NotificationDropdown = ({ userRole = 'admin' }) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
     
-    const userId = userRole === 'admin' ? 'ADMIN-001' : 'VOL-001';
-
     useEffect(() => {
-        axios.get(`http://localhost:5001/api/notifications?recipientType=${userRole}&recipientId=${userId}&unread=true`)
+        const userId = Cookies.get("userId");
+        if (!userId) {
+            console.error("No user ID found in cookies");
+            return;
+        }
+
+        axios.get(`http://localhost:5001/api/notifications?recipientType=${userRole}&unread=true`, 
+            { withCredentials: true })
             .then((res) => setNotifications(res.data))
             .catch((err) => console.error("Error fetching notifications:", err));
-    }, [userRole, userId]);
+    }, [userRole]);
 
     const unreadCount = notifications.filter(notif => !notif.read).length;
 
     const markAsRead = (id) => {
-        axios.put(`http://localhost:5001/api/notifications/${id}/read`)
+        axios.put(`http://localhost:5001/api/notifications/${id}/read`, {}, 
+            { withCredentials: true }) 
             .then(() => {
                 setNotifications(notifications.map(notif =>
                     notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
