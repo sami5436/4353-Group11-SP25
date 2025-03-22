@@ -15,6 +15,7 @@
     "@react-google-maps/api": "^2.20.5",
     "@tailwindcss/vite": "^4.0.0",
     "axios": "^1.7.9",
+    "cookie-parser": "^1.4.7",
     "framer-motion": "^12.4.1",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.263.1",

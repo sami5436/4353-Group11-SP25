@@ -3,6 +3,7 @@ import AdminNavbar from "../components/adminNavbar";
 import EventHistory from "../components/adminEventHistory";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -21,7 +22,13 @@ const AdminDashboard = () => {
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-        axios.get("http://localhost:5001/api/adminProfile")
+        const userId = Cookies.get("userId"); 
+        if (!userId) {
+            console.error("No user ID found in cookies");
+            return;
+        }
+    
+        axios.get("http://localhost:5001/api/adminProfile", { withCredentials: true })
             .then((res) => {
                 setProfileData(res.data);
                 setIsLoading(false);
@@ -90,7 +97,7 @@ const AdminDashboard = () => {
             return;
         }
         
-        axios.put("http://localhost:5001/api/adminProfile", formValues)
+        axios.put("http://localhost:5001/api/adminProfile", formValues, { withCredentials: true })
             .then((res) => {
                 setProfileData(res.data);
                 if (res.data.fullySignedUp) {
@@ -102,18 +109,7 @@ const AdminDashboard = () => {
             })
             .catch((err) => {
                 console.error("Error updating profile:", err);
-                
-                setProfileData({
-                    ...profileData,
-                    ...formValues
-                });
-                
-                if (err.response && err.response.data && err.response.data.errors) {
-                    setErrorMessage(err.response.data.errors.join(", "));
-                } 
-                else {
-                    setErrorMessage("Failed to update profile. Please try again.");
-                }
+                setErrorMessage("Failed to update profile. Please try again.");
             });
     };
 
@@ -126,7 +122,7 @@ const AdminDashboard = () => {
                 <>
                     <div className="mb-10">
                         <h2 className="text-3xl font-semibold mb-2">Welcome!</h2>
-                        <p className="text-xl text-gray-600 font-medium mb-5">Admin ID: {profileData.adminId}</p>
+                        <p className="text-xl text-gray-600 font-medium mb-5">Admin ID: {profileData._id}</p>
                     </div>
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-bold mb-6">Profile Review</h2>
