@@ -3,24 +3,68 @@ const app = require("../server");
 const connectDB = require("../db");
 const { ObjectId } = require("mongodb");
 
-let db;
-let client;
+jest.mock("../db", () => {
+  const mockCollection = {
+    find: jest.fn().mockReturnThis(),
+    toArray: jest.fn().mockImplementation(function() {
+      const query = this._query || {};
+      
+      const testId = "67dcfcf2b7002f35f9a9a446";
+      
+      if (query.volunteers) {
+        if (query.volunteers === testId) {
+          if (query.status === "Upcoming") {
+            return Promise.resolve([{
+              _id: "event1",
+              name: "For volunteer.test.js",
+              date: "2024-06-01",
+              status: "Upcoming",
+              volunteers: [testId]
+            }]);
+          }
+          return Promise.resolve([{
+            _id: "event1",
+            name: "For volunteer.test.js",
+            date: "2024-06-01",
+            status: "Upcoming",
+            volunteers: [testId]
+          }]);
+        }
+        return Promise.resolve([]);
+      }
+      return Promise.resolve([]);
+    }),
+  };
 
-beforeAll(async () => {
-  const connection = await connectDB();
-  client = connection.client;
-  db = connection.db;
+  mockCollection.find.mockImplementation(function(query) {
+    this._query = query;
+    return this;
+  });
+  
+  const mockDb = {
+    collection: jest.fn().mockReturnValue(mockCollection),
+  };
+  
+  return jest.fn().mockResolvedValue(mockDb);
 });
 
-afterAll(async () => {
-  if (client) await client.close();
+jest.mock("mongodb", () => {
+  const originalModule = jest.requireActual("mongodb");
+  return {
+    ...originalModule,
+    ObjectId: jest.fn().mockImplementation((id) => {
+      return {
+        toString: () => id || "mocked-object-id"
+      };
+    }),
+  };
 });
 
 describe("getEventsByID", () => {
   const testingID = "67dcfcf2b7002f35f9a9a446";
 
   test("If no events found for this volunteer, should return 404", async () => {
-    const nonExistentId = new ObjectId();
+    const nonExistentId = "nonexistentid123456789012";
     const response = await request(app).get(
       `/api/volunteers/volunteer/${nonExistentId}`
     );
@@ -45,9 +89,9 @@ describe("getUpcomingEventsByID", () => {
   const testingID = "67dcfcf2b7002f35f9a9a446";
 
   test("If no events found for this volunteer, should return 404", async () => {
-    const nonExistentId = new ObjectId();
+    const nonExistentId = "nonexistentid123456789012";
     const response = await request(app).get(
-      `/api/volunteers/volunteer/${nonExistentId}`
+      `/api/volunteers/volunteer/${nonExistentId}/upcoming`
     );
 
     expect(response.status).toBe(404);

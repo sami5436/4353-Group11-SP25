@@ -7,15 +7,13 @@ const {
   getVolunteers, 
   addVolunteerToEvent,
   updateEvent,
-  getAllVolunteers,
-  getEventsByVolunteerId
+  getAllVolunteers
 } = require('../controllers/eventsController');
 
 router.get('/', getVolunteerHistory);
 
 router.post('/volunteerHistory', addEvent);
 router.get('/allVolunteers', getAllVolunteers);
-router.get('/volunteer/:id', getEventsByVolunteerId);
 
 router.get('/history', getVolunteerHistory);
 router.post('/', addEvent);

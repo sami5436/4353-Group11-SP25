@@ -50,6 +50,21 @@ const addEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
   const eventId = req.params.id;
   
+  // Validate request body
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "Request body cannot be empty" });
+  }
+
+  // Basic validation for some fields
+  if (req.body.name !== undefined && req.body.name.trim() === '') {
+    return res.status(400).json({ message: "Name cannot be empty" });
+  }
+
+  if (req.body.status !== undefined && 
+     !['Upcoming', 'Completed', 'Cancelled'].includes(req.body.status)) {
+    return res.status(400).json({ message: "Invalid status value" });
+  }
+  
   try {
     const eventsCollection = db.collection("events");
     
@@ -172,10 +187,20 @@ const getAllVolunteers = async (req, res) => {
 
 
 const addVolunteerToEvent = async (req, res) => {
-  const { eventId, volunteerId, sourceEventId } = req.body;
+  const { eventId, volunteerId, volunteerName, volunteerEmail, sourceEventId } = req.body;
+
+  if (!eventId || (!volunteerId && (!volunteerName || !volunteerEmail))) {
+    return res.status(400).json({ message: "Required fields are missing" });
+  }
 
   try {
     const eventsCollection = db.collection("events");
+    
+    // Check if the event exists first
+    const eventExists = await eventsCollection.findOne({ _id: new ObjectId(eventId) });
+    if (!eventExists) {
+      return res.status(404).json({ message: "Event not found" });
+    }
     
     // If sourceEventId is provided, we need to remove the volunteer from there first
     if (sourceEventId) {
@@ -185,56 +210,26 @@ const addVolunteerToEvent = async (req, res) => {
       );
     }
 
+    // Create volunteer object if name/email provided
+    const volunteer = volunteerId ? volunteerId : { 
+      name: volunteerName, 
+      email: volunteerEmail,
+      id: new ObjectId().toString()
+    };
+
     // Add volunteer to the target event
     await eventsCollection.updateOne(
       { _id: new ObjectId(eventId) },
-      { $push: { volunteers: volunteerId } }
+      { $push: { volunteers: volunteerId || volunteer } }
     );
 
-    res.status(201).json({ volunteerId });
+    res.status(201).json({ volunteerId: volunteerId || volunteer.id });
   } catch (error) {
     console.error("Error managing volunteer:", error);
     res.status(500).json({ message: "Error managing volunteer", error });
   }
 };
-const getEventsByVolunteerId = async (req, res) => {
-  const volunteerId = req.params.id;
-  
-  try {
-    // Validate the volunteer ID format
-    let objectId;
-    try {
-      objectId = new ObjectId(volunteerId);
-    } catch (error) {
-      return res.status(400).json({ message: "Invalid volunteer ID format" });
-    }
-    
-    const eventsCollection = db.collection("events");
-    const volunteersCollection = db.collection("users");
-    
-    // First, check if the volunteer exists
-    const volunteer = await volunteersCollection.findOne({ _id: objectId });
-    if (!volunteer) {
-      return res.status(404).json({ message: "Volunteer not found" });
-    }
-    
-    // Find all events where this volunteer ID exists in the volunteers array
-    const events = await eventsCollection.find({ 
-      volunteers: volunteerId 
-    }).toArray();
-    
-    // Format the response to include the "volunteered" flag
-    const formattedEvents = events.map(event => ({
-      ...event,
-      volunteered: true // Since we're only getting events they volunteered for
-    }));
-    
-    res.json(formattedEvents);
-  } catch (error) {
-    console.error("Error retrieving volunteer events:", error);
-    res.status(500).json({ message: "Error retrieving volunteer events", error: error.message });
-  }
-};
+
 
 module.exports = {
   getVolunteerHistory,
@@ -244,5 +239,4 @@ module.exports = {
   addVolunteerToEvent,
   updateEvent,
   getAllVolunteers,
-  getEventsByVolunteerId
 };
