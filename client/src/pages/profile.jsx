@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { Pencil } from "lucide-react";
-import CreatableSelect from 'react-select/creatable';
+import CreatableSelect from "react-select/creatable";
 import axios from "axios";
 import DatePicker from "react-multi-date-picker";
 import "../styles/volunteerProfileAvailabilityStyling.css"; // Import the custom green theme
@@ -28,16 +28,62 @@ function Profile() {
     zipCode2: "",
     skills: [],
     availability: [],
-    preferences: ""
+    preferences: "",
   });
   const [errors, setErrors] = useState([]);
 
   const states = [
-    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA",
-    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "DC",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY",
   ];
 
   const skillOptions = [
@@ -63,24 +109,44 @@ function Profile() {
     "Teaching",
     "Tutoring",
     "Web Development",
-    "Writing"
+    "Writing",
   ];
 
   // Convert skillOptions array to format required by react-select
-  const skillSelectOptions = skillOptions.map(skill => ({
+  const skillSelectOptions = skillOptions.map((skill) => ({
     value: skill.toLowerCase(),
-    label: skill
+    label: skill,
   }));
 
   useEffect(() => {
     const volunteerId = Cookies.get("userId");
-    console.log("profile.jsx: Volunteer ID from cookie:", volunteerId); // Log the volunteer ID
+    console.log("profile.jsx: Volunteer ID from cookie:", volunteerId);
+
     const fetchProfileData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`);
-        console.log("Profile data fetched:", response.data); // Log the response data
-        setProfileData(response.data);
-        setEditedData(response.data);
+        const response = await axios.get(
+          `http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`
+        );
+        console.log("Profile data fetched:", response.data);
+
+        const formattedData = {
+          ...response.data,
+          availability: response.data.availability
+            ? response.data.availability.map((date) => {
+                if (
+                  date &&
+                  typeof date === "object" &&
+                  (date.dateObject || date.unix)
+                ) {
+                  return date;
+                }
+                return new Date(date);
+              })
+            : [],
+        };
+
+        setProfileData(formattedData);
+        setEditedData(formattedData);
 
         // Determine if the second address should be shown
         const { address2, city2, state2, zipCode2 } = response.data;
@@ -111,17 +177,52 @@ function Profile() {
     setEditedData(updatedData);
   };
 
+  // This snippet shows how to modify the handleSave function in your Profile component
+  // to correctly handle availability dates before sending to the backend
+
   const handleSave = async (e) => {
     e.preventDefault();
     const volunteerId = Cookies.get("userId"); // Retrieve the volunteer ID
+
+    // Format the availability dates to ISO strings before sending to the backend
+    const formattedData = {
+      ...editedData,
+      availability: editedData.availability
+        ? editedData.availability.map((date) => {
+            // If date is already a string, return it
+            if (typeof date === "string") {
+              return date;
+            }
+            // If date is a DatePicker object with a dateObject
+            else if (date && date.dateObject) {
+              return date.dateObject;
+            }
+            // If date is a DatePicker object with a unix timestamp
+            else if (date && date.unix) {
+              return new Date(date.unix * 1000).toISOString();
+            }
+            // If date is a Date object
+            else if (date instanceof Date) {
+              return date.toISOString();
+            }
+            // Otherwise, try to convert whatever it is to a date
+            return new Date(date).toISOString();
+          })
+        : [],
+    };
+
     try {
-      const response = await axios.put(`http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`, editedData);
+      const response = await axios.put(
+        `http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`,
+        formattedData
+      );
       setProfileData(response.data.volunteerProfile);
       setIsEditing(false);
       setErrors([]);
 
-      await axios.post(`http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`);
-
+      await axios.post(
+        `http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`
+      );
     } catch (error) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -141,7 +242,7 @@ function Profile() {
       address2: "",
       city2: "",
       state2: "",
-      zipCode2: ""
+      zipCode2: "",
     });
     setShowSecondAddress(false);
   };
@@ -153,18 +254,22 @@ function Profile() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <VolunteerNavbar />
-      
+
       <div className="flex-1 ml-64 p-8">
-        <h1 className="text-3xl font-bold mb-6">Hello{profileData.firstName ? `, ${profileData.firstName}` : ''}!</h1>
+        <h1 className="text-3xl font-bold mb-6">
+          Hello{profileData.firstName ? `, ${profileData.firstName}` : ""}!
+        </h1>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-xl font-bold">Profile Information</h2>
-              <p className="text-gray-600 text-sm">Update your profile information and preferences</p>
+              <p className="text-gray-600 text-sm">
+                Update your profile information and preferences
+              </p>
             </div>
             {!isEditing && (
-              <button 
+              <button
                 onClick={handleEdit}
                 className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
@@ -187,7 +292,9 @@ function Profile() {
             <h3 className="text-lg font-semibold">Personal Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name *
+                </label>
                 <input
                   type="text"
                   name="firstName"
@@ -196,11 +303,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name *
+                </label>
                 <input
                   type="text"
                   name="lastName"
@@ -209,11 +318,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email *
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -222,11 +333,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
                 <input
                   type="tel"
                   name="phone"
@@ -235,11 +348,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date of Birth *
+                </label>
                 <input
                   type="date"
                   name="dateOfBirth"
@@ -248,11 +363,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender *
+                </label>
                 <select
                   name="gender"
                   value={editedData.gender || ""}
@@ -260,7 +377,7 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
@@ -274,7 +391,9 @@ function Profile() {
             {/* Location Information Section */}
             <h3 className="text-lg font-semibold mt-6">Address Information</h3>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address *
+              </label>
               <input
                 type="text"
                 name="address1"
@@ -283,12 +402,14 @@ function Profile() {
                 disabled={!isEditing}
                 required
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                  ${!isEditing ? "bg-gray-50" : "bg-white"}`}
               />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  City *
+                </label>
                 <input
                   type="text"
                   name="city1"
@@ -297,11 +418,13 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  State *
+                </label>
                 <select
                   name="state1"
                   value={editedData.state1 || ""}
@@ -309,16 +432,20 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 >
                   <option value="">Select state</option>
-                  {states.map(state => (
-                    <option key={state} value={state}>{state}</option>
+                  {states.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Zip Code *
+                </label>
                 <input
                   type="text"
                   name="zipCode1"
@@ -327,7 +454,7 @@ function Profile() {
                   disabled={!isEditing}
                   required
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                    ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                    ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 />
               </div>
             </div>
@@ -346,9 +473,13 @@ function Profile() {
 
             {showSecondAddress && (
               <>
-                <h4 className="text-lg font-semibold mt-4">Secondary Address</h4>
+                <h4 className="text-lg font-semibold mt-4">
+                  Secondary Address
+                </h4>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address 2 *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address 2 *
+                  </label>
                   <input
                     type="text"
                     name="address2"
@@ -357,12 +488,14 @@ function Profile() {
                     disabled={!isEditing}
                     required
                     className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                      ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                      ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      City *
+                    </label>
                     <input
                       type="text"
                       name="city2"
@@ -371,11 +504,13 @@ function Profile() {
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                        ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      State *
+                    </label>
                     <select
                       name="state2"
                       value={editedData.state2 || ""}
@@ -383,16 +518,20 @@ function Profile() {
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                        ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                     >
                       <option value="">Select state</option>
-                      {states.map(state => (
-                        <option key={state} value={state}>{state}</option>
+                      {states.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Zip Code *
+                    </label>
                     <input
                       type="text"
                       name="zipCode2"
@@ -401,7 +540,7 @@ function Profile() {
                       disabled={!isEditing}
                       required
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                        ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                        ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                     />
                   </div>
                 </div>
@@ -418,31 +557,44 @@ function Profile() {
             )}
 
             {/* Volunteer Information Section */}
-            <h3 className="text-lg font-semibold mt-6">Volunteer Information</h3>
+            <h3 className="text-lg font-semibold mt-6">
+              Volunteer Information
+            </h3>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Skills
+              </label>
               <CreatableSelect
                 isMulti
                 isDisabled={!isEditing}
-                value={skillSelectOptions.filter(option => 
-                  (isEditing ? editedData.skills : (profileData.skills || [])).includes(option.value)
+                value={skillSelectOptions.filter((option) =>
+                  (isEditing
+                    ? editedData.skills
+                    : profileData.skills || []
+                  ).includes(option.value)
                 )}
-                onChange={(selectedOptions) => setEditedData({
-                  ...editedData,
-                  skills: selectedOptions ? selectedOptions.map(option => option.value) : []
-                })}
+                onChange={(selectedOptions) =>
+                  setEditedData({
+                    ...editedData,
+                    skills: selectedOptions
+                      ? selectedOptions.map((option) => option.value)
+                      : [],
+                  })
+                }
                 options={skillSelectOptions}
                 className="rounded-lg"
                 classNamePrefix="select"
                 placeholder="Type to search or add new skills..."
-                formatCreateLabel={(inputValue) => `Add "${inputValue}" as a new skill`}
+                formatCreateLabel={(inputValue) =>
+                  `Add "${inputValue}" as a new skill`
+                }
                 theme={(theme) => ({
                   ...theme,
                   colors: {
                     ...theme.colors,
-                    primary: '#059669',
-                    primary25: '#f0fdf4',
-                    primary50: '#dcfce7',
+                    primary: "#059669",
+                    primary25: "#f0fdf4",
+                    primary50: "#dcfce7",
                   },
                 })}
               />
@@ -452,25 +604,31 @@ function Profile() {
             </div>
 
             <div className="green">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Availability
+              </label>
               <DatePicker
                 multiple
                 value={editedData.availability}
-                onChange={(dates) => setEditedData({ ...editedData, availability: dates })}
+                onChange={(dates) =>
+                  setEditedData({ ...editedData, availability: dates })
+                }
                 disabled={!isEditing}
                 format="MM/DD/YYYY"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Preferences</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Preferences
+              </label>
               <textarea
                 name="preferences"
                 value={editedData.preferences || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}
+                  ${!isEditing ? "bg-gray-50" : "bg-white"}`}
                 placeholder="Enter your preferences here..."
               />
             </div>

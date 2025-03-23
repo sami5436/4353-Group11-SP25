@@ -36,7 +36,7 @@ function History() {
 
       <div className="flex-1 ml-64 p-10">
         <div className="text-2xl text-gray-800 font-bold mb-6">
-          Thank you for your help, John.
+          Thank you for your help!
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
