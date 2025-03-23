@@ -2,32 +2,60 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import VolunteerNavbar from "../components/volunteerNavbar";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, AlertTriangle } from "lucide-react";
 import Cookies from "js-cookie";
 
 function VolunteerAssignments() {
   const [isOpen, setIsOpen] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
   const [assignedEvents, setAssignedEvents] = useState([]);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      const volunteerId = Cookies.get("userId"); // Retrieve userId from cookie
-      
-      axios
-        .get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}/upcoming`)
-        .then((response) => {
-          setAssignedEvents(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching assigned events:", error);
-        });
+      fetchAssignedEvents();
     }
   }, [isOpen]);
+
+  const fetchAssignedEvents = () => {
+    const volunteerId = Cookies.get("userId"); // Retrieve userId from cookie
+      
+    axios
+      .get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}/upcoming`)
+      .then((response) => {
+        setAssignedEvents(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching assigned events:", error);
+      });
+  };
 
   const handleClick = () => {
     setIsOpen(true);
     setTimeout(() => setShowEvents(true), 600);
+  };
+
+  const handleDeleteConfirmation = (eventId) => {
+    setConfirmDelete(eventId);
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDelete(null);
+  };
+
+  const handleConfirmDelete = (eventId) => {
+    const volunteerId = Cookies.get("userId");
+    
+    axios
+      .delete(`http://localhost:5001/api/volunteers/event/${eventId}/volunteer/${volunteerId}`)
+      .then(() => {
+        // Remove the event from the local state
+        setAssignedEvents(assignedEvents.filter(event => event._id !== eventId));
+        setConfirmDelete(null);
+      })
+      .catch((error) => {
+        console.error("Error removing volunteer from event:", error);
+      });
   };
 
   return (
@@ -62,16 +90,51 @@ function VolunteerAssignments() {
                   {assignedEvents.length > 0 ? (
                     assignedEvents.map((event, index) => (
                       <motion.li
-                        key={event.id}
+                        key={event._id}
                         className="p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.2 }}
                       >
-                        <p className="font-semibold">{event.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {event.date} - {event.city}, {event.state}
-                        </p>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">{event.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {event.date} - {event.city}, {event.state}
+                            </p>
+                          </div>
+                          
+                          {confirmDelete === event._id ? (
+                            <div className="flex flex-col items-end">
+                              <div className="flex items-center mb-1 text-red-500 text-xs">
+                                <AlertTriangle size={14} className="mr-1" />
+                                <span>Remove yourself?</span>
+                              </div>
+                              <div className="flex space-x-2">
+                                <button 
+                                  onClick={() => handleConfirmDelete(event._id)}
+                                  className="text-xs bg-red-500 text-white px-2 py-1 rounded"
+                                >
+                                  Yes
+                                </button>
+                                <button 
+                                  onClick={handleCancelDelete}
+                                  className="text-xs bg-gray-200 px-2 py-1 rounded"
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleDeleteConfirmation(event._id)}
+                              className="text-gray-400 hover:text-red-500"
+                              title="Remove yourself from this event"
+                            >
+                              <X size={18} />
+                            </button>
+                          )}
+                        </div>
                       </motion.li>
                     ))
                   ) : (

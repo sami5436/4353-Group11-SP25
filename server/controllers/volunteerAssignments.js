@@ -9,9 +9,9 @@ const assignVolunteer = async (req, res) => {
     let objectId;
     try {
       objectId = new ObjectId(volunteerId);
-      console.log("here!!");
+      console.log("Valid volunteer ID format");
     } catch (error) {
-      console.log(" no good here!!");
+      console.log("Invalid volunteer ID format");
       return res.status(400).json({ error: "Invalid volunteer ID format" });
     }
     
@@ -27,29 +27,99 @@ const assignVolunteer = async (req, res) => {
     if (!volunteer.zipCode1 || !volunteer.skills || !volunteer.availability) {
       return res.status(400).json({ error: "Volunteer data is incomplete" });
     }
-    
-    // Try to find a matching event
-    let matchingEvent = await eventsCollection.findOne({
+
+    console.log("Volunteer data:", {
+      id: volunteerId,
       zipCode: volunteer.zipCode1,
-      skills: { $in: volunteer.skills },
-      date: { $in: volunteer.availability }
+      skills: volunteer.skills,
+      availability: volunteer.availability
     });
     
+    const allEvents = await eventsCollection.find({}).toArray();
+    
+    const availableEvents = allEvents.filter(event => {
+      const eventVolunteers = event.volunteers || [];
+      return !eventVolunteers.includes(volunteerId);
+    });
+    
+    const scoredEvents = availableEvents.map(event => {
+      let score = 0;
+      
+      if (event.zipCode === volunteer.zipCode1) {
+        score += 1;
+      }
+      
+      const eventSkills = event.skills || [];
+      const volunteerSkills = volunteer.skills || [];
+      const hasMatchingSkill = volunteerSkills.some(skill => 
+        eventSkills.includes(skill)
+      );
+      if (hasMatchingSkill) {
+        score += 1;
+      }
+      
+      const eventDates = Array.isArray(event.date) ? event.date : [event.date];
+      const volunteerDates = volunteer.availability || [];
+      
+      const hasMatchingDate = volunteerDates.some(volunteerDate => {
+        const volunteerDateStr = volunteerDate instanceof Date 
+          ? volunteerDate.toISOString().split('T')[0] 
+          : volunteerDate;
+          
+        return eventDates.some(eventDate => {
+          const eventDateStr = eventDate instanceof Date 
+            ? eventDate.toISOString().split('T')[0] 
+            : eventDate;
+          
+          return eventDateStr === volunteerDateStr;
+        });
+      });
+      
+      if (hasMatchingDate) {
+        score += 1;
+      }
+      
+      return {
+        event,
+        score,
+        matches: {
+          zipCode: event.zipCode === volunteer.zipCode1,
+          skills: hasMatchingSkill,
+          dates: hasMatchingDate
+        }
+      };
+    });
+    
+    scoredEvents.sort((a, b) => b.score - a.score);
+    
+    console.log("Top 3 matching events:", scoredEvents.slice(0, 3).map(e => ({
+      name: e.event.name,
+      score: e.score,
+      matches: e.matches
+    })));
+    
+    if (scoredEvents.length > 1) {
+      const bestMatch = scoredEvents[0];
+      console.log(`Best match: ${bestMatch.event.name} with score ${bestMatch.score}`);
+      console.log(`Match details: ${JSON.stringify(bestMatch.matches)}`);
+    }
+    
+    // Assign to the best match if it has at least 1 matching criterion
+    let matchingEvent = null;
     let assignedToFallback = false;
     
-    // If no matching event, assign to fallback
-    if (!matchingEvent) {
+    if (scoredEvents.length > 0 && scoredEvents[0].score >= 1) {
+      matchingEvent = scoredEvents[0].event;
+      console.log("Found matching event with score:", scoredEvents[0].score);
+    } else {
+      // Use fallback if no good match
       assignedToFallback = true;
       matchingEvent = await eventsCollection.findOne({ _id: new ObjectId(fallbackEventId) });
+      console.log("No good match found, using fallback event");
       
       if (!matchingEvent) {
         return res.status(404).json({ error: "Fallback event not found" });
       }
-    }
-    
-    // Prevent duplicate assignment - handle null volunteers array
-    if (matchingEvent.volunteers && matchingEvent.volunteers.includes(volunteerId)) {
-      return res.status(400).json({ error: "Volunteer already assigned to this event" });
     }
     
     // Add volunteer to event
@@ -62,6 +132,8 @@ const assignVolunteer = async (req, res) => {
     
     res.status(200).json({
       message: `Volunteer assigned ${assignedToFallback ? "to fallback event" : "successfully"}`,
+      matchScore: assignedToFallback ? 0 : scoredEvents[0].score,
+      matchDetails: assignedToFallback ? null : scoredEvents[0].matches,
       event: {
         ...updatedEvent,
         volunteered: true

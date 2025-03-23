@@ -1,24 +1,24 @@
 const { ObjectId } = require("mongodb");
 const connectDB = require("../db");
 
-// Step 1: Extract volunteerId
+// Get volunteer profile by ID
 const getVolunteerProfile = async (req, res) => {
   const volunteerId = req.params.id; // Extracting volunteerId from request parameters
   console.log("Extracted Volunteer ID:", volunteerId); // Log the volunteer ID for debugging
-
-  // Step 2: Connect to the Database
+  
+  // Connect to the Database
   try {
     const db = await connectDB(); // Attempt to connect to the database
     console.log("Database connection successful!"); // Log success message
-
-    // Step 3: Query the Database
+    
+    // Query the Database
     const volunteerProfile = await db.collection("users").findOne({ _id: new ObjectId(volunteerId) });
-
-    // Step 4: Handle the Response
+    
+    // Handle the Response
     if (!volunteerProfile) {
       return res.status(404).json({ message: "Volunteer not found" }); // Return 404 if not found
     }
-
+    
     res.json(volunteerProfile); // Return the volunteer profile data
   } catch (error) {
     console.error("Error retrieving volunteer profile:", error); // Log any errors
@@ -26,20 +26,42 @@ const getVolunteerProfile = async (req, res) => {
   }
 };
 
-// Step 1: Extract volunteerId
+// Update volunteer profile
 const updateVolunteerProfile = async (req, res) => {
   const volunteerId = req.params.id; // Extracting volunteerId from request parameters
   console.log("updateVolunteer - Extracted Volunteer ID:", volunteerId); // Log the volunteer ID for debugging
-
-  // Step 2: Connect to the Database
+  
+  // Connect to the Database
   try {
     const db = await connectDB(); // Attempt to connect to the database
     console.log("Database connection successful!"); // Log success message
-
-    // Step 3: Prepare the Update Object
-    const updatedData = req.body; // Get the updated data from the request body
-    const { _id, ...updateObject } = req.body; // Exclude _id from the update object and Start with the incoming data
-
+    
+    // Get the updated data from the request body
+    const { _id, ...updatedData } = req.body; // Exclude _id from the update object
+    
+    // Handle the availability array - convert to YYYY-MM-DD format
+    if (updatedData.availability && Array.isArray(updatedData.availability)) {
+      // Format dates to YYYY-MM-DD strings only
+      updatedData.availability = updatedData.availability.map(date => {
+        let dateObj;
+        
+        // Handle different possible date formats
+        if (date && typeof date === 'object' && date.dateObject) {
+          dateObj = new Date(date.dateObject);
+        } else if (date && typeof date === 'object' && date.unix) {
+          dateObj = new Date(date.unix * 1000);
+        } else if (date) {
+          dateObj = new Date(date);
+        }
+        
+        // Return YYYY-MM-DD format only if valid date
+        if (dateObj && !isNaN(dateObj.getTime())) {
+          return dateObj.toISOString().split('T')[0]; // Returns "2025-03-25" format
+        }
+        return null;
+      }).filter(date => date !== null); // Remove any null values
+    }
+    
     // Check if required fields are filled to set fullySignedUp
     const requiredFields = [
       updatedData.firstName,
@@ -55,31 +77,33 @@ const updateVolunteerProfile = async (req, res) => {
     ];
     
     const requiredFieldsFilled = requiredFields.every(field => Boolean(field)); // Check if all fields are truthy
+    updatedData.fullySignedUp = requiredFieldsFilled;
     
-    updateObject.fullySignedUp = requiredFieldsFilled;
-
-    // Step 4: Update the Database
+    // Update the Database
     const result = await db.collection("users").updateOne(
       { _id: new ObjectId(volunteerId) }, // Filter to find the correct volunteer
-      { $set: updateObject } // Update the document with the new data
+      { $set: updatedData } // Update the document with the new data
     );
-
-    // Step 5: Handle the Response
+    
+    // Handle the Response
     if (result.modifiedCount === 0) {
       return res.status(404).json({ message: "Volunteer not found or no changes made" }); // Handle case where no document was updated
     }
-
-    res.status(200).json({ message: "Profile updated successfully", volunteerProfile: updateObject }); // Return success message
+    
+    // Fetch the updated document to return to the client
+    const updatedProfile = await db.collection("users").findOne({ _id: new ObjectId(volunteerId) });
+    
+    res.status(200).json({ 
+      message: "Profile updated successfully", 
+      volunteerProfile: updatedProfile 
+    }); // Return success message with updated data
   } catch (error) {
     console.error("Error updating volunteer profile:", error); // Log any errors
-    return res.status(500).json({ message: "Error updating volunteer profile", error: error.message }); // Return error response
+    return res.status(500).json({ 
+      message: "Error updating volunteer profile", 
+      error: error.message 
+    }); // Return error response
   }
-};
-
-// Export the controller functions
-module.exports = {
-  updateVolunteerProfile,
-  // other functions...
 };
 
 // Export the controller functions
