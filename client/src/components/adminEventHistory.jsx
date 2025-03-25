@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import AdminNavbar from "./adminNavbar";
+import Cookies from "js-cookie";
 
 const EventHistory = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -154,6 +155,7 @@ const EventHistory = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(eventData),
         });
 
@@ -189,6 +191,7 @@ const EventHistory = () => {
       }
 
       handleClose();
+      window.location.reload();
     } catch (error) {
       console.error("Error saving event:", error);
       // Display error message to user
