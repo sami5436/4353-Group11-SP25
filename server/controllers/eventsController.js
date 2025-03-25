@@ -18,9 +18,14 @@ const getVolunteerHistory = async (req, res) => {
 // Add a new event 
 const addEvent = async (req, res) => {
   const { name, date, city, state, zipCode, address, status, description, skills } = req.body;
+  const userId = req.cookies.userId;
 
   if (!name || !date || !city || !state || !zipCode || !address || !status || !description) {
     return res.status(400).json({ message: "All fields are required" });
+  }
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized: Admin ID not found" });
   }
 
   const newEvent = {
@@ -33,14 +38,35 @@ const addEvent = async (req, res) => {
     status,
     description,
     skills: skills || [],
-    volunteers: []
+    volunteers: [],
+    createdBy: userId
   };
 
   try {
     const eventsCollection = db.collection("events");
+    const notificationsCollection = db.collection("notifications");
+
     const result = await eventsCollection.insertOne(newEvent);
-    res.status(201).json({ ...newEvent, _id: result.insertedId });
+
+    const notification = {
+      recipientId: userId, 
+      recipientType: "admin",
+      message: `New Event Created: ${name}`,
+      timestamp: new Date(),
+      read: false,
+      details: `Event Details: ${name} on ${date} in ${city}, ${state} \n ${description}`,
+      notificationType: "event_creation"
+    };
+
+    await notificationsCollection.insertOne(notification);
+
+    res.status(201).json({ 
+      ...newEvent, 
+      _id: result.insertedId,
+      notificationCreated: true 
+    });
   } catch (error) {
+    console.error("Error adding event:", error);
     res.status(500).json({ message: "Error adding event", error });
   }
 };
@@ -49,6 +75,10 @@ const addEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
   const eventId = req.params.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized: No user ID found" });
+  }
   
   // Validate request body
   if (Object.keys(req.body).length === 0) {

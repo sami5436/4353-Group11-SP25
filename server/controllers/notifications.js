@@ -25,6 +25,15 @@ const getNotifications = async (req, res) => {
       query.notificationType = type;
     }
 
+    // Only getting notifications that are unread or within a 2 week window
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+
+    query.$or = [
+      { timestamp: { $gte: oneMonthAgo } },
+      { read: false }
+    ];    
+
     if (unread === "true") {
       query.read = false;
     }
@@ -57,7 +66,7 @@ const markAsRead = async (req, res) => {
     const notificationsCollection = db.collection("notifications");
 
     const notification = await notificationsCollection.findOne({ 
-      notifId: parseInt(id),
+      _id: new ObjectId(id),
       recipientId: userId
     });
 
@@ -66,7 +75,7 @@ const markAsRead = async (req, res) => {
     }
 
     const result = await notificationsCollection.updateOne(
-      { notifId: parseInt(id), recipientId: userId },
+      { _id: new ObjectId(id), recipientId: userId },
       { $set: { read: true } }
     );
 
@@ -75,7 +84,7 @@ const markAsRead = async (req, res) => {
     }
 
     const updatedNotification = await notificationsCollection.findOne({
-      notifId: parseInt(id),
+      _id: new ObjectId(id),
       recipientId: userId
     });
 

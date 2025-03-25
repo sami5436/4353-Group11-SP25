@@ -29,7 +29,7 @@ const NotificationDropdown = ({ userRole = 'admin' }) => {
             { withCredentials: true }) 
             .then(() => {
                 setNotifications(notifications.map(notif =>
-                    notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
+                    notif._id === id ? { ...notif, read: true } : notif
                 ));
             })
             .catch((err) => console.error("Error marking notification as read:", err));
@@ -78,11 +78,11 @@ const NotificationDropdown = ({ userRole = 'admin' }) => {
                         {notifications.length > 0 ? (
                             notifications.map(notification => (
                                 <div
-                                 key={notification.notifId}
+                                 key={notification._id}
                                  className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
                                     !notification.read ? 'bg-emerald-50' : ''
                                  }`}
-                                 onClick={() => markAsRead(notification.notifId)}
+                                 onClick={() => markAsRead(notification._id)}
                                 >
                                     <p className="text-sm mb-1 text-gray-800">{notification.message}</p>
                                     <p className="text-xs text-gray-500">

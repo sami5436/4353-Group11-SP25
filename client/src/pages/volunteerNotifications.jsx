@@ -45,7 +45,7 @@ const VolunteerNotifications = () => {
         axios.put(`http://localhost:5001/api/notifications/${id}/read`, {}, { withCredentials: true })
             .then(res => {
                 setNotifications(notifications.map(notif =>
-                    notif.notifId === parseInt(id) ? { ...notif, read: true } : notif
+                    notif._id === id ? { ...notif, read: true } : notif
                 ));
             })
             .catch(err => console.error("Error marking notification as read:", err));
@@ -108,7 +108,7 @@ const VolunteerNotifications = () => {
                     {notifications.length > 0 ? (
                             notifications.map(notification => (
                                 <div
-                                    key={notification.notifId}
+                                    key={notification._id}
                                     className={`p-6 ${!notification.read ? 'bg-emerald-50' : ''}`}
                                 >
                                     <div className="flex justify-between items-start">
@@ -126,7 +126,7 @@ const VolunteerNotifications = () => {
                                             </span>
                                             {!notification.read && (
                                                 <button
-                                                    onClick={() => markAsRead(notification.notifId)}
+                                                    onClick={() => markAsRead(notification._id)}
                                                     className="p-1 hover:bg-emerald-100 cursor-pointer rounded-full transition-colors"
                                                     title="Mark as read"
                                                 >
