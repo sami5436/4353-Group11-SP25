@@ -36,7 +36,11 @@ function DroppableArea({ id, name, assignedVolunteers }) {
       <h3 className="font-bold">{name}</h3>
       {assignedVolunteers.length > 0 ? (
         assignedVolunteers.map((vol) => (
-          <DraggableItem key={`${id}-${vol.id}`} id={vol.id} name={vol.name} />
+          <DraggableItem
+            key={`${id}-${vol.id}`}
+            id={`${id}-${vol.id}`} // Make ID unique per event
+            name={vol.name}
+          />
         ))
       ) : (
         <span className="text-gray-500">Drop volunteers here</span>
@@ -87,8 +91,12 @@ function AdminManageVolunteers() {
               return {
                 id: volunteerId,
                 name:
-                  details.firstName + " "  + details.lastName ||
-                  `Volunteer ${volunteerId.substring(0, 6)}...`, 
+                  details.firstName +
+                    " " +
+                    details.lastName +
+                    " ID: " +
+                    volunteerId.substring(0, 6) ||
+                  `Volunteer ${volunteerId.substring(0, 6)}...`,
                 email: details.email || "",
                 originalEventId: event._id,
               };
@@ -104,27 +112,17 @@ function AdminManageVolunteers() {
       })
       .catch((err) => console.error("Error fetching events:", err))
       .finally(() => setIsLoading(false));
-  }, [volunteerDetails]); // ✅ Runs after `volunteerDetails` is updated
+  }, [volunteerDetails]);
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over || !over.id || active.id === over.id) return;
 
-    const volunteerId = active.id;
-    let sourceEventId = null;
-    let sourceEventName = null;
-    let volunteer = null;
+    const [sourceEventName, volunteerId] = active.id.split("-");
 
-    for (const eventName in eventAssignments) {
-      const volunteers = eventAssignments[eventName];
-      const foundVolunteer = volunteers.find((v) => v.id === volunteerId);
-      if (foundVolunteer) {
-        sourceEventName = eventName;
-        volunteer = foundVolunteer;
-        sourceEventId = foundVolunteer.originalEventId;
-        break;
-      }
-    }
+    const volunteers = eventAssignments[sourceEventName];
+    const volunteer = volunteers.find((v) => v.id === volunteerId);
+    const sourceEventId = volunteer?.originalEventId;
 
     if (!volunteer || sourceEventName === over.id) return;
 

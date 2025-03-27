@@ -4,6 +4,32 @@ const { ObjectId } = require("mongodb");
 let db;
 connectDB().then((database) => (db = database));
 
+const getVolunteerById = async (req, res) => {
+  const volunteerId = req.params.id;
+
+  try{
+    const usersCollection = db.collection("users");
+    const getAllVolunteers = await usersCollection
+      .find({
+        volunteers: volunteerId
+      })
+      .toArray();
+
+
+
+
+
+  } catch(error){
+    console.error("Error retrieving volunteer data:", error);
+    res.status(500).json({
+      message: "Error retrieving volunteer data",
+      error: error.message,
+    });
+
+
+  }
+
+}
 const getUpcomingEventsByVolunteerId = async (req, res) => {
   const volunteerId = req.params.id;
 
@@ -138,4 +164,5 @@ module.exports = {
   getEventsByVolunteerId,
   getUpcomingEventsByVolunteerId,
   removeVolunteerFromEvent,
+  getVolunteerById
 };
