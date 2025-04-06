@@ -27,7 +27,7 @@ function Login() {
       setError("Please fill in all fields");
       return;
     }
-
+ 
     try {
       const response = await axios.post("http://localhost:5001/api/auth/login", {
         email: formData.email,
