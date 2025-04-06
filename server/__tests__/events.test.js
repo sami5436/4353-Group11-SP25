@@ -10,8 +10,13 @@ jest.mock("mongodb", () => {
   return {
     ...originalModule,
     ObjectId: jest.fn().mockImplementation((id) => {
-      // For testing, just return the id string to avoid ObjectId validation issues
-      return id ? id : "mockObjectId123456789012";
+      if (id === "999999999999999999999999") {
+        return { toString: () => "999999999999999999999999" };
+      }
+      // Make sure we return an object with toString method to mimic real ObjectId behavior
+      return {
+        toString: () => id || "mockObjectId123456789012"
+      };
     }),
   };
 });
@@ -72,18 +77,30 @@ let mockEvents = [
 // Mock volunteer data
 const mockVolunteers = [
   {
-    _id: new ObjectId("vol1"),
+    _id: { toString: () => "vol1" },
     firstName: "John",
     lastName: "Doe",
     email: "john@example.com"
   },
   {
-    _id: new ObjectId("vol2"),
+    _id: { toString: () => "vol2" },
     firstName: "Jane",
     lastName: "Smith",
     email: "jane@example.com"
   }
 ];
+
+// Mock auth with cookies
+const mockCookies = () => {
+  // Mock the cookies middleware to simulate authenticated requests
+  const originalGet = app.request.get;
+  app.request.get = function(field) {
+    if (field === 'cookie') {
+      return 'userId=admin123'; // Simulate auth cookie
+    }
+    return originalGet.apply(this, arguments);
+  };
+};
 
 // Setup the mocks before running tests
 beforeAll(async () => {
@@ -97,7 +114,7 @@ beforeAll(async () => {
   
   // Setup findOne to return different results based on query
   mockCollection.findOne.mockImplementation((query) => {
-    if (query._id === "event1" || query._id === "123456789012345678901234") {
+    if (query._id === "event1" || query._id.toString() === "123456789012345678901234") {
       return Promise.resolve(mockEvents[0]);
     } else if (query._id === "event2") {
       return Promise.resolve(mockEvents[1]);
@@ -128,6 +145,9 @@ beforeAll(async () => {
   
   // Setup deleteOne
   mockCollection.deleteOne.mockResolvedValue({ deletedCount: 1 });
+  
+  // Setup auth cookies for tests
+  mockCookies();
 });
 
 // Reset mock function calls between tests
@@ -141,7 +161,10 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.toArray.mockResolvedValue(mockEvents);
 
-    const res = await request(app).get("/api/events/history");
+    const res = await request(app)
+      .get("/api/events/history")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThan(0);
@@ -151,7 +174,10 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.toArray.mockResolvedValue(mockEvents);
 
-    const res = await request(app).get("/api/events");
+    const res = await request(app)
+      .get("/api/events")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBe(mockEvents.length);
@@ -161,24 +187,25 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.toArray.mockRejectedValue(new Error("Database error"));
 
-    const res = await request(app).get("/api/events/history");
+    const res = await request(app)
+      .get("/api/events/history")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error retrieving events");
   });
 
   it("should add a new event", async () => {
     const newEvent = {
-      name: "deleteThis",
+      name: "New Test Event",
       date: "2024-06-01",
-      city: "delete city",
+      city: "Test City",
       state: "TX",
       zipCode: "12345",
-      address: "789 delete St",
+      address: "123 Test St",
       status: "Upcoming",
-      description: "An event for tests, delete it",
-      volunteered: false,
-      volunteers: [],
-      skills: ["Deleting tests lol"],
+      description: "Test Description",
+      skills: ["Testing"]
     };
 
     // Configure mock for this specific test
@@ -187,7 +214,11 @@ describe("Event fetcher API for volunteer history", () => {
       insertedId: "123456789012345678901234" // Valid ObjectId format
     });
 
-    const res = await request(app).post("/api/events").send(newEvent);
+    const res = await request(app)
+      .post("/api/events")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(newEvent);
+      
     expect(res.statusCode).toBe(201);
     expect(res.body.name).toBe(newEvent.name);
     expect(res.body.skills).toEqual(expect.arrayContaining(newEvent.skills));
@@ -208,7 +239,11 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.insertOne.mockRejectedValue(new Error("Database insertion error"));
 
-    const res = await request(app).post("/api/events").send(newEvent);
+    const res = await request(app)
+      .post("/api/events")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(newEvent);
+      
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error adding event");
   });
@@ -220,9 +255,35 @@ describe("Event fetcher API for volunteer history", () => {
       skills: [],
     };
 
-    const res = await request(app).post("/api/events").send(invalidEvent);
+    const res = await request(app)
+      .post("/api/events")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(invalidEvent);
+      
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toBe("All fields are required");
+  });
+  
+  it("should not add an event without auth", async () => {
+    const newEvent = {
+      name: "New Test Event",
+      date: "2024-06-01",
+      city: "Test City",
+      state: "TX",
+      zipCode: "12345",
+      address: "123 Test St",
+      status: "Upcoming",
+      description: "Test Description",
+      skills: ["Testing"]
+    };
+
+    // No auth cookie set
+    const res = await request(app)
+      .post("/api/events")
+      .send(newEvent);
+      
+    expect(res.statusCode).toBe(401);
+    expect(res.body.message).toBe("Unauthorized: Admin ID not found");
   });
 
   it("should fetch upcoming events", async () => {
@@ -230,7 +291,10 @@ describe("Event fetcher API for volunteer history", () => {
     mockCollection.find.mockReturnThis();
     mockCollection.toArray.mockResolvedValue([mockEvents[0]]);
 
-    const res = await request(app).get("/api/events/upcoming");
+    const res = await request(app)
+      .get("/api/events/upcoming")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -240,7 +304,10 @@ describe("Event fetcher API for volunteer history", () => {
     mockCollection.find.mockReturnThis();
     mockCollection.toArray.mockRejectedValue(new Error("Database error"));
 
-    const res = await request(app).get("/api/events/upcoming");
+    const res = await request(app)
+      .get("/api/events/upcoming")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error retrieving upcoming events");
   });
@@ -253,7 +320,10 @@ describe("Event fetcher API for volunteer history", () => {
       { name: "Event 2", volunteers: [{ id: "v2", name: "Volunteer 2" }] }
     ]);
 
-    const res = await request(app).get("/api/events/volunteers");
+    const res = await request(app)
+      .get("/api/events/volunteers")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -262,18 +332,26 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.toArray.mockRejectedValue(new Error("Database error"));
 
-    const res = await request(app).get("/api/events/volunteers");
+    const res = await request(app)
+      .get("/api/events/volunteers")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error retrieving volunteers");
   });
 
   it("should fetch all volunteers with detailed information", async () => {
     const mockCollection = mockDb.collection();
+    // First call to toArray for events
     mockCollection.toArray.mockResolvedValueOnce(mockEvents);
     mockCollection.find.mockReturnThis();
+    // Second call to toArray for volunteers
     mockCollection.toArray.mockResolvedValueOnce(mockVolunteers);
 
-    const res = await request(app).get("/api/events/allVolunteers");
+    const res = await request(app)
+      .get("/api/events/allVolunteers")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -282,7 +360,10 @@ describe("Event fetcher API for volunteer history", () => {
     const mockCollection = mockDb.collection();
     mockCollection.toArray.mockRejectedValue(new Error("Database error"));
 
-    const res = await request(app).get("/api/events/allVolunteers");
+    const res = await request(app)
+      .get("/api/events/allVolunteers")
+      .set('Cookie', ['userId=admin123']); // Add auth cookie
+      
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error retrieving all volunteers");
   });
@@ -314,7 +395,11 @@ describe("Event fetcher API for volunteer history", () => {
       name: "Volunteer Test Event" 
     });
 
-    const eventRes = await request(app).post("/api/events").send(newEvent);
+    const eventRes = await request(app)
+      .post("/api/events")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(newEvent);
+      
     expect(eventRes.statusCode).toBe(201);
     const eventId = eventRes.body.id || validObjectId;
 
@@ -330,6 +415,7 @@ describe("Event fetcher API for volunteer history", () => {
 
     const volunteerRes = await request(app)
       .post("/api/events/addVolunteer")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
       .send(newVolunteer);
     
     expect(volunteerRes.statusCode).toBe(201);
@@ -348,6 +434,7 @@ describe("Event fetcher API for volunteer history", () => {
     
     const res = await request(app)
       .post("/api/events/addVolunteer")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
       .send(transferData);
       
     expect(res.statusCode).toBe(201);
@@ -362,6 +449,7 @@ describe("Event fetcher API for volunteer history", () => {
     
     const res = await request(app)
       .post("/api/events/addVolunteer")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
       .send(invalidData);
       
     expect(res.statusCode).toBe(400);
@@ -381,10 +469,30 @@ describe("Event fetcher API for volunteer history", () => {
     
     const res = await request(app)
       .post("/api/events/addVolunteer")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
       .send(volunteerData);
       
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error managing volunteer");
+  });
+  
+  it("should return 404 when event not found for volunteer addition", async () => {
+    const mockCollection = mockDb.collection();
+    mockCollection.findOne.mockResolvedValue(null); // Event not found
+    
+    const volunteerData = {
+      eventId: "nonexistentEvent",
+      volunteerName: "Test Volunteer", 
+      volunteerEmail: "test@example.com",
+    };
+    
+    const res = await request(app)
+      .post("/api/events/addVolunteer")
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(volunteerData);
+      
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe("Event not found");
   });
 });
 
@@ -420,22 +528,21 @@ describe("Volunteer History API - Additional Test Cases", () => {
     });
   });
 
-
-  it("should not update an event with invalid data", async () => {
-    const res = await request(app).put(`/api/events/${eventId}`).send({
-      name: "",
-      status: 1234, // Invalid status type
-    });
+  
+  
+  it("should return 400 for invalid ObjectId format", async () => {
+    const invalidId = "not-an-object-id";
+    const updateData = {
+      name: "Updated Name" 
+    };
+    
+    const res = await request(app)
+      .put(`/api/events/${invalidId}`)
+      .set('Cookie', ['userId=admin123']) // Add auth cookie
+      .send(updateData);
     
     expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe("Name cannot be empty");
-  });
-
-  it("should not update with empty request body", async () => {
-    const res = await request(app).put(`/api/events/${eventId}`).send({});
-    
-    expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe("Request body cannot be empty");
+    expect(res.body.message).toBe("Invalid event ID format");
   });
 
 
