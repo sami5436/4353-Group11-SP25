@@ -75,6 +75,7 @@ const addEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
   const eventId = req.params.id;
+  const userId = req.cookies.userId; 
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized: No user ID found" });

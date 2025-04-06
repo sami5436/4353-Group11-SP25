@@ -65,7 +65,7 @@ function AdminManageVolunteers() {
 
         const volunteersMap = {};
         res.data.forEach((volunteer) => {
-          volunteersMap[volunteer.id] = volunteer; // Store full volunteer details
+          volunteersMap[volunteer.id] = volunteer; 
         });
 
         setVolunteerDetails(volunteersMap);
