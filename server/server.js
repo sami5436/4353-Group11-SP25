@@ -8,6 +8,7 @@ const volunteerAssignmentsRoutes = require("./routes/volunteerAssignmentsRoutes"
 const authRoutes = require("./routes/authRoutes");
 const userVolunteerRoutes = require("./routes/volunteerProfile");
 const volunteerRoutes = require("./routes/volunteerRoutes");
+const eventsReportRoutes = require("./routes/eventsReport");
 const cookieParser = require('cookie-parser');
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/volunteerAssignments", volunteerAssignmentsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/volunteerProfile", userVolunteerRoutes);
+app.use("/api/reports", eventsReportRoutes);
 
 const PORT = process.env.PORT || 5001;
 
