@@ -12,4 +12,8 @@ router.get("/skills", eventsReportController.getSkillsDistribution);
 
 router.get("/locations", eventsReportController.getTopLocations);
 
+router.get("/generate/volunteers", eventsReportController.generateVolunteersReport);
+router.get("/generate/events", eventsReportController.generateEventsReport);
+router.get("/generate/summary", eventsReportController.generateSummaryReport);
+
 module.exports = router;
