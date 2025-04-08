@@ -9,7 +9,7 @@ const getReportSummary = async (req, res) => {
     const eventsCollection = db.collection("events");
     const usersCollection = db.collection("users");
 
-    const totalVolunteers = await usersCollection.countDocuments({ role: "volunteer" });
+    const totalVolunteers = await usersCollection.countDocuments({ userType: "volunteer" });
 
     const upcomingEvents = await eventsCollection.countDocuments({ status: "Upcoming" });
 
@@ -18,9 +18,18 @@ const getReportSummary = async (req, res) => {
     const allEvents = await eventsCollection.find({}).toArray();
     let totalHours = 0;
     
+    //Hours calculated based on urgency, anywhere from 3-8
     allEvents.forEach(event => {
-      if (event.volunteers && Array.isArray(event.volunteers)) {
-        totalHours += event.volunteers.length * 5;
+      if (Array.isArray(event.volunteers) && event.volunteers.length > 0) {
+        if (event.urgency === "High") {
+          totalHours += 8;
+        }
+        else if (event.urgency === "Medium") {
+          totalHours += 5;
+        }
+        else {
+          totalHours += 3;
+        }
       }
     });
 
