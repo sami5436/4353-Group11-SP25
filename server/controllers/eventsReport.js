@@ -164,13 +164,10 @@ const generateVolunteersReport = async (req, res) => {
     const usersCollection = db.collection("users");
     const eventsCollection = db.collection("events");
     
-    // Get all volunteers
     const volunteers = await usersCollection.find({ userType: "volunteer" }).toArray();
     
-    // Get all events
     const events = await eventsCollection.find({}).toArray();
     
-    // Create volunteer participation history
     const volunteersWithHistory = await Promise.all(volunteers.map(async (volunteer) => {
       const participationHistory = events.filter(event => 
         event.volunteers && event.volunteers.includes(volunteer._id.toString())
@@ -183,7 +180,7 @@ const generateVolunteersReport = async (req, res) => {
       
       return {
         _id: volunteer._id,
-        name: volunteer.name,
+        name: `${volunteer.firstName} ${volunteer.lastName}`,
         email: volunteer.email,
         phone: volunteer.phone,
         skills: volunteer.skills || [],
@@ -192,7 +189,6 @@ const generateVolunteersReport = async (req, res) => {
       };
     }));
     
-    // Generate the report based on the requested format
     if (format === 'pdf') {
       return generatePdfVolunteersReport(res, volunteersWithHistory);
     } else if (format === 'csv') {
@@ -212,17 +208,14 @@ const generateEventsReport = async (req, res) => {
     const eventsCollection = db.collection("events");
     const usersCollection = db.collection("users");
     
-    // Get all events
     const events = await eventsCollection.find({}).toArray();
     
-    // Get all volunteers
     const volunteers = await usersCollection.find({ userType: "volunteer" }).toArray();
     const volunteersMap = {};
     volunteers.forEach(volunteer => {
       volunteersMap[volunteer._id.toString()] = volunteer;
     });
     
-    // Enhance events with volunteer details
     const enhancedEvents = events.map(event => {
       const assignedVolunteers = [];
       
@@ -232,7 +225,8 @@ const generateEventsReport = async (req, res) => {
           if (volunteer) {
             assignedVolunteers.push({
               id: volunteerId,
-              name: volunteer.name,
+              firstName: volunteer.firstName,
+              lastName: volunteer.lastName,
               email: volunteer.email,
               role: event.roles ? event.roles[volunteerId] : 'Volunteer'
             });
@@ -254,7 +248,6 @@ const generateEventsReport = async (req, res) => {
       };
     });
     
-    // Generate the report based on the requested format
     if (format === 'pdf') {
       return generatePdfEventsReport(res, enhancedEvents);
     } else if (format === 'csv') {
@@ -272,10 +265,8 @@ const generateSummaryReport = async (req, res) => {
   try {
     const format = req.query.format || 'pdf';
     
-    // Fetch all the summary data
     const summaryData = await getSummaryReportData();
     
-    // Generate the report based on the requested format
     if (format === 'pdf') {
       return generatePdfSummaryReport(res, summaryData);
     } else if (format === 'csv') {
@@ -289,7 +280,6 @@ const generateSummaryReport = async (req, res) => {
   }
 };
 
-// Helper function to get all summary data
 const getSummaryReportData = async () => {
   const eventsCollection = db.collection("events");
   const usersCollection = db.collection("users");
@@ -313,7 +303,6 @@ const getSummaryReportData = async () => {
     }
   });
   
-  // Get monthly engagement data
   const monthlyData = {};
   const currentYear = new Date().getFullYear();
   
@@ -339,7 +328,6 @@ const getSummaryReportData = async () => {
     events: monthlyData[index]?.events || 0
   }));
   
-  // Get status distribution
   const statusCounts = await eventsCollection.aggregate([
     { $group: { _id: "$status", count: { $sum: 1 } } }
   ]).toArray();
@@ -349,7 +337,6 @@ const getSummaryReportData = async () => {
     count: item.count
   }));
   
-  // Get skills distribution
   const skillsCount = {};
   
   allEvents.forEach(event => {
@@ -383,27 +370,51 @@ const getSummaryReportData = async () => {
   };
 };
 
-// PDF Report Generation Functions
 const generatePdfVolunteersReport = (res, volunteersData) => {
   const doc = new PDFDocument();
+  doc.font('Times-Roman');
   
-  // Set response headers
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', 'attachment; filename=volunteers_report.pdf');
   
-  // Pipe the PDF to the response
   doc.pipe(res);
   
-  // Add title and content...
-  // (your existing code)
+  doc.fontSize(24).text('Volunteers Report', { align: 'center' });
+  doc.moveDown();
+  doc.fontSize(14).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'center' });
+  doc.moveDown(2);
   
-  // Make sure to end the document
+  doc.fontSize(14).text('Summary', { underline: true });
+  doc.moveDown();
+  doc.fontSize(12).text(`Total Volunteers: ${volunteersData.length}`);
+  doc.moveDown(2);
+  
+  doc.fontSize(14).text('Volunteer List', { underline: true });
+  doc.moveDown();
+  
+  volunteersData.forEach((volunteer, index) => {
+    doc.fontSize(13).text(`${index + 1}. ${volunteer.name}`);
+    doc.fontSize(12).text(`Email: ${volunteer.email}`);
+    doc.fontSize(12).text(`Phone: ${volunteer.phone || 'Not provided'}`);
+    doc.fontSize(12).text(`Skills: ${volunteer.skills.join(', ') || 'None specified'}`);
+    doc.fontSize(12).text(`Participation Count: ${volunteer.participationCount}`);
+    
+    if (volunteer.participationHistory && volunteer.participationHistory.length > 0) {
+      doc.fontSize(12).text('Event History:');
+      volunteer.participationHistory.forEach(event => {
+        doc.fontSize(12).text(`• ${event.eventName} (${new Date(event.date).toLocaleDateString()}) - ${event.status}`, { indent: 20 });
+      });
+    }
+    
+    doc.moveDown();
+  });
+  
   doc.end();
 };
 
-// Implement missing PDF functions
 const generatePdfEventsReport = (res, eventsData) => {
   const doc = new PDFDocument();
+  doc.font('Times-Roman');
   
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', 'attachment; filename=events_report.pdf');
@@ -412,15 +423,13 @@ const generatePdfEventsReport = (res, eventsData) => {
   
   doc.fontSize(24).text('Events Report', { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'center' });
+  doc.fontSize(14).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'center' });
   doc.moveDown(2);
   
-  // Summary
-  doc.fontSize(18).text('Summary');
+  doc.fontSize(14).text('Summary', { underline: true });
   doc.moveDown();
   doc.fontSize(12).text(`Total Events: ${eventsData.length}`);
   
-  // Events by status
   const statusCounts = {};
   eventsData.forEach(event => {
     if (!statusCounts[event.status]) statusCounts[event.status] = 0;
@@ -428,27 +437,26 @@ const generatePdfEventsReport = (res, eventsData) => {
   });
   
   Object.entries(statusCounts).forEach(([status, count]) => {
-    doc.text(`${status} Events: ${count}`);
+    doc.fontSize(12).text(`${status} Events: ${count}`);
   });
   doc.moveDown(2);
   
-  // List all events
-  doc.fontSize(18).text('Event List');
+  doc.fontSize(14).text('Event List', { underline: true });
   doc.moveDown();
   
   eventsData.forEach((event, index) => {
-    doc.fontSize(14).text(`${index + 1}. ${event.name}`);
+    doc.fontSize(13).text(`${index + 1}. ${event.name}`);
     doc.fontSize(12).text(`Date: ${new Date(event.date).toLocaleDateString()}`);
-    doc.text(`Location: ${event.location}`);
-    doc.text(`Status: ${event.status}`);
-    doc.text(`Urgency: ${event.urgency}`);
-    doc.text(`Required Skills: ${event.skills.join(', ') || 'None'}`);
-    doc.text(`Volunteers: ${event.volunteerCount}`);
+    doc.fontSize(12).text(`Location: ${event.location}`);
+    doc.fontSize(12).text(`Status: ${event.status}`);
+    doc.fontSize(12).text(`Urgency: ${event.urgency}`);
+    doc.fontSize(12).text(`Required Skills: ${event.skills.join(', ') || 'None'}`);
+    doc.fontSize(12).text(`Volunteers: ${event.volunteerCount}`);
     
     if (event.volunteers.length > 0) {
-      doc.text('Assigned Volunteers:');
+      doc.fontSize(12).text('Assigned Volunteers:');
       event.volunteers.forEach(volunteer => {
-        doc.text(`• ${volunteer.name} (${volunteer.email}) - ${volunteer.role}`, { indent: 20 });
+        doc.fontSize(12).text(`• ${volunteer.firstName} ${volunteer.lastName} (${volunteer.email})`, { indent: 20 });
       });
     }
     
@@ -460,6 +468,7 @@ const generatePdfEventsReport = (res, eventsData) => {
 
 const generatePdfSummaryReport = (res, summaryData) => {
   const doc = new PDFDocument();
+  doc.font('Times-Roman');
   
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', 'attachment; filename=summary_report.pdf');
@@ -468,11 +477,10 @@ const generatePdfSummaryReport = (res, summaryData) => {
   
   doc.fontSize(24).text('Summary Analytics Report', { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'center' });
+  doc.fontSize(14).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'center' });
   doc.moveDown(2);
   
-  // Overview section
-  doc.fontSize(18).text('Overview');
+  doc.fontSize(14).text('Overview', { underline: true });
   doc.moveDown();
   doc.fontSize(12).text(`Total Volunteers: ${summaryData.overview.totalVolunteers}`);
   doc.text(`Total Volunteer Hours: ${summaryData.overview.volunteerHours}`);
@@ -480,29 +488,26 @@ const generatePdfSummaryReport = (res, summaryData) => {
   doc.text(`Completed Events: ${summaryData.overview.completedEvents}`);
   doc.moveDown(2);
   
-  // Monthly engagement
-  doc.fontSize(18).text('Monthly Engagement');
+  doc.fontSize(14).text('Monthly Engagement', { underline: true });
   doc.moveDown();
   summaryData.engagement.forEach(item => {
     if (item.events > 0 || item.volunteers > 0) {
-      doc.text(`${item.month}: ${item.events} events, ${item.volunteers} volunteer assignments`);
+      doc.fontSize(12).text(`${item.month}: ${item.events} events, ${item.volunteers} volunteer assignments`);
     }
   });
   doc.moveDown(2);
   
-  // Event distribution by status
-  doc.fontSize(18).text('Event Distribution');
+  doc.fontSize(14).text('Event Distribution', { underline: true });
   doc.moveDown();
   summaryData.distribution.forEach(item => {
-    doc.text(`${item.status}: ${item.count} events`);
+    doc.fontSize(12).text(`${item.status}: ${item.count} events`);
   });
   doc.moveDown(2);
   
-  // Skills distribution
-  doc.fontSize(18).text('Skills Distribution');
+  doc.fontSize(14).text('Skills Distribution', { underline: true });
   doc.moveDown();
   summaryData.skills.slice(0, 10).forEach(item => {
-    doc.text(`${item.skill}: ${item.count} events`);
+    doc.fontSize(12).text(`${item.skill}: ${item.count} events`);
   });
   
   doc.end();
@@ -512,9 +517,7 @@ const generateCsvVolunteersReport = (res, volunteersData) => {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=volunteers_report.csv');
   
-  // Transform data for CSV
   const flattenedData = volunteersData.map(volunteer => ({
-    id: volunteer._id.toString(),
     name: volunteer.name,
     email: volunteer.email,
     phone: volunteer.phone || '',
@@ -522,7 +525,6 @@ const generateCsvVolunteersReport = (res, volunteersData) => {
     participationCount: volunteer.participationCount
   }));
   
-  // Use json2csv to convert data to CSV
   try {
     const parser = new Parser({ fields: Object.keys(flattenedData[0] || {}) });
     const csv = parser.parse(flattenedData);
@@ -537,9 +539,7 @@ const generateCsvEventsReport = (res, eventsData) => {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=events_report.csv');
   
-  // Transform data for CSV
   const flattenedData = eventsData.map(event => ({
-    id: event.id.toString(),
     name: event.name,
     date: new Date(event.date).toLocaleDateString(),
     location: event.location,
@@ -563,9 +563,7 @@ const generateCsvSummaryReport = (res, summaryData) => {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=summary_report.csv');
   
-  // Create multiple sections in the CSV
   try {
-    // Overview data
     const overviewFields = ['metric', 'value'];
     const overviewData = [
       { metric: 'Total Volunteers', value: summaryData.overview.totalVolunteers },
@@ -576,19 +574,15 @@ const generateCsvSummaryReport = (res, summaryData) => {
     const overviewParser = new Parser({ fields: overviewFields });
     const overviewCsv = overviewParser.parse(overviewData);
     
-    // Engagement data
     const engagementParser = new Parser();
     const engagementCsv = engagementParser.parse(summaryData.engagement);
     
-    // Distribution data
     const distributionParser = new Parser();
     const distributionCsv = distributionParser.parse(summaryData.distribution);
     
-    // Skills data
     const skillsParser = new Parser();
     const skillsCsv = skillsParser.parse(summaryData.skills);
     
-    // Combine all sections
     const fullCsv = [
       'OVERVIEW',
       overviewCsv,

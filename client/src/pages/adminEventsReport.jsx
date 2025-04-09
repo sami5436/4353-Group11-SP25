@@ -95,15 +95,20 @@ const AdminEventsReport = () => {
             link.remove();
             
             setReportMessage(`Report generated successfully! Downloading...`);
+            setTimeout(() => {
+                setReportMessage(null);
+            }, 2500);
         } catch (err) {
             console.error("Error generating report:", err);
             setReportMessage(`Failed to generate report. Please try again later.`);
+            setTimeout(() => {
+                setReportMessage(null);
+            }, 5000);
         } finally {
             setGeneratingReport(false);
         }
     };
 
-    // Colors for charts
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
     return (
