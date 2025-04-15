@@ -10,23 +10,43 @@ const VolunteerNotifications = () => {
     
     const recipientType = "volunteer";
 
+    const checkEventReminders = async () => {
+        try {
+            await axios.get('http://localhost:5001/api/notifications/check-all-reminders', 
+                { withCredentials: true }
+            );
+            console.log("Reminder check completed");
+        } catch (err) {
+            console.error("Error checking reminders:", err);
+        }
+    };
+    
     useEffect(() => {
         const userId = Cookies.get("userId");
         if (!userId) {
             console.error("No user ID found in cookies");
             return;
         }
-
-        let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}`;
-        if (filter === 'unread') {
-          url += '&unread=true';
-        } else if (filter !== 'all') {
-          url += `&type=${filter}`;
-        }
-        
-        axios.get(url, { withCredentials: true })
-          .then(res => setNotifications(res.data))
-          .catch(err => console.error("Error fetching notifications:", err));
+    
+        const loadData = async () => {
+            await checkEventReminders();
+    
+            let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}`;
+            if (filter === 'unread') {
+                url += '&unread=true';
+            } else if (filter !== 'all') {
+                url += `&type=${filter}`;
+            }
+    
+            try {
+                const res = await axios.get(url, { withCredentials: true });
+                setNotifications(res.data);
+            } catch (err) {
+                console.error("Error fetching notifications:", err);
+            }
+        };
+    
+        loadData();
     }, [filter]);
 
     const markAllAsRead = () => {
@@ -56,7 +76,7 @@ const VolunteerNotifications = () => {
         'all',
         'unread',
         'event_reminder',
-        'schedule_change',
+        'event_update',
         'new_event'
     ];
 

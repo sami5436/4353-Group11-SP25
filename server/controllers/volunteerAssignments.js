@@ -127,6 +127,20 @@ const assignVolunteer = async (req, res) => {
       { _id: matchingEvent._id },
       { $push: { volunteers: volunteerId } }
     );
+
+    const notificationsCollection = db.collection("notifications");
+
+    const newEventNotification = {
+      recipientId: volunteerId,
+      recipientType: "volunteer",
+      message: `New Event Assigned: ${matchingEvent.name}`,
+      timestamp: new Date(),
+      read: false,
+      details: `You have been assigned to the event "${matchingEvent.name}". Please check your schedule and event details.`,
+      notificationType: "new_event"
+    };
+
+    await notificationsCollection.insertOne(newEventNotification);
     
     const updatedEvent = await eventsCollection.findOne({ _id: matchingEvent._id });
     

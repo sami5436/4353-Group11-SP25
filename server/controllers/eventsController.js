@@ -81,12 +81,10 @@ const updateEvent = async (req, res) => {
     return res.status(401).json({ message: "Unauthorized: No user ID found" });
   }
   
-  // Validate request body
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ message: "Request body cannot be empty" });
   }
 
-  // Basic validation for some fields
   if (req.body.name !== undefined && req.body.name.trim() === '') {
     return res.status(400).json({ message: "Name cannot be empty" });
   }
@@ -98,8 +96,8 @@ const updateEvent = async (req, res) => {
   
   try {
     const eventsCollection = db.collection("events");
+    const notificationsCollection = db.collection("notifications");
     
-    // First, validate that the ID is a valid ObjectId
     let objectId;
     try {
       objectId = new ObjectId(eventId);
@@ -107,8 +105,12 @@ const updateEvent = async (req, res) => {
       return res.status(400).json({ message: "Invalid event ID format" });
     }
     
-    // The issue might be here - MongoDB Node.js driver v4+ changed findOneAndUpdate behavior
-    // Let's fix this to return the correct response format
+    const originalEvent = await eventsCollection.findOne({ _id: objectId });
+    
+    if (!originalEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    
     const result = await eventsCollection.findOneAndUpdate(
       { _id: objectId },
       { $set: req.body },
@@ -119,7 +121,61 @@ const updateEvent = async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
     
-    res.json(result);
+    const updatedFields = [];
+    for (const [key, value] of Object.entries(req.body)) {
+      if (JSON.stringify(originalEvent[key]) !== JSON.stringify(value)) {
+        updatedFields.push(key);
+      }
+    }
+    
+    const changes = updatedFields.map(field => {
+      if (field === 'date') {
+        return `Date changed from ${originalEvent.date} to ${req.body.date}`;
+      } else if (field === 'status') {
+        return `Status updated from ${originalEvent.status} to ${req.body.status}`;
+      } else if (field === 'skills') {
+        return 'Required skills have been updated';
+      } else if (field === 'description') {
+        return 'Event description has been updated';
+      } else {
+        return `${field.charAt(0).toUpperCase() + field.slice(1)} has been updated`;
+      }
+    }).join(', ');
+    
+    if (updatedFields.length > 0) {
+      const adminNotification = {
+        recipientId: userId,
+        recipientType: "admin",
+        message: `Event Updated: ${result.name}`,
+        timestamp: new Date(),
+        read: false,
+        details: `The following changes were made to ${result.name}:\n${changes}`,
+        notificationType: "event_update"
+      };
+      
+      await notificationsCollection.insertOne(adminNotification);
+      
+      if (originalEvent.volunteers && originalEvent.volunteers.length > 0) {
+        const bulkNotifications = originalEvent.volunteers.map(volunteerId => ({
+          recipientId: volunteerId,
+          recipientType: "volunteer",
+          message: `Event Update: ${result.name}`,
+          timestamp: new Date(),
+          read: false,
+          details: `The event "${result.name}" you signed up for has been updated:\n${changes}`,
+          notificationType: "event_update"
+        }));
+        
+        if (bulkNotifications.length > 0) {
+          await notificationsCollection.insertMany(bulkNotifications);
+        }
+      }
+    }
+    
+    res.json({
+      ...result,
+      notificationsCreated: updatedFields.length > 0
+    });
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).json({ message: "Error updating event", error: error.message });
