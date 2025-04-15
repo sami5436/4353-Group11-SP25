@@ -153,6 +153,10 @@ function Profile() {
         if (address2 || city2 || state2 || zipCode2) {
           setShowSecondAddress(true);
         }
+
+        await axios.post(
+          `http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`
+        );
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }

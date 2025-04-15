@@ -97,6 +97,25 @@ const signup = async (req, res) => {
 
     const result = await usersCollection.insertOne(newUser);
 
+    const notificationsCollection = db.collection("notifications");
+    const admins = await usersCollection.find({ userType: "admin" }).toArray();
+
+    const notification = {
+      recipientType: "admin",
+      message: `New ${role || "Volunteer"} Signup`,
+      timestamp: new Date(),
+      read: false,
+      details: `A new ${role || "volunteer"} has signed up with email: ${email}`,
+      notificationType: "new_signup"
+    };
+
+    const adminNotifications = admins.map((admin) => ({
+      recipientId: admin._id.toString(),
+      ...notification,
+    }));
+
+    await notificationsCollection.insertMany(adminNotifications);
+
     res.status(201).json({
       message: "User registered successfully",
       userId: result.insertedId,

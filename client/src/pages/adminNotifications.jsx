@@ -63,7 +63,7 @@ const AdminNotifications = () => {
     const filterTypes = [
         'all',
         'unread',
-        'volunteer_signup',
+        'new_signup',
         'event_update',
         'event_creation'
     ];

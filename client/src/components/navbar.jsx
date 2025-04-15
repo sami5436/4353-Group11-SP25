@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { User } from "lucide-react";
+import Cookies from "js-cookie";
 
 function Navbar() {
   return (
@@ -27,7 +28,15 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="/login" className="text-[#F8F9FA] hover:text-emerald-300 flex items-center">
+              <Link to={
+                  Cookies.get("userId")
+                    ? Cookies.get("userRole") === "admin"
+                      ? "/admin/profile"
+                      : "/volunteer/profile"
+                    : "/login"
+                }
+                className="text-[#F8F9FA] hover:text-emerald-300 flex items-center"
+              >
                 <User className="mr-2" size={20} />
               </Link>
             </li>

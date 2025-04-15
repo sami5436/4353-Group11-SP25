@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import AdminNavbar from "./adminNavbar";
 import Cookies from "js-cookie";
 
