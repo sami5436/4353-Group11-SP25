@@ -26,6 +26,9 @@ jest.mock("../db", () => {
     findOne: jest.fn(),
     updateOne: jest.fn(),
     updateMany: jest.fn(),
+    insertMany: jest.fn(),
+    insertOne: jest.fn(),
+    countDocuments: jest.fn(),
     sort: jest.fn().mockReturnThis(),
     toArray: jest.fn(),
   };
@@ -70,6 +73,36 @@ const mockNotifications = [
   }
 ];
 
+// Mock events data for testing reminders
+const mockEvents = [
+  {
+    _id: new ObjectId("60d21b4967d0d8992e610c85"),
+    name: "Test Event 1",
+    date: new Date().toISOString().split('T')[0], // Today's date in yyyy-mm-dd format
+    status: "Upcoming",
+    volunteers: ["user123", "user456"],
+    createdBy: "admin123",
+    address: "123 Main St",
+    city: "Houston",
+    state: "TX"
+  },
+  {
+    _id: new ObjectId("60d21b4967d0d8992e610c86"),
+    name: "Test Event 2",
+    date: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() + 3); // 3 days from now
+      return date.toISOString().split('T')[0];
+    })(),
+    status: "Upcoming",
+    volunteers: ["user789"],
+    createdBy: "admin456",
+    address: "456 Oak Ave",
+    city: "Austin",
+    state: "TX"
+  }
+];
+
 let mockDb;
 
 // Setup the mocks before running tests
@@ -105,6 +138,15 @@ beforeAll(async () => {
   
   // Setup updateMany to return success
   mockCollection.updateMany.mockResolvedValue({ modifiedCount: 2 });
+
+  // Setup insertMany to return success
+  mockCollection.insertMany.mockResolvedValue({ insertedCount: 2, insertedIds: { 0: "new1", 1: "new2" } });
+  
+  // Setup insertOne to return success
+  mockCollection.insertOne.mockResolvedValue({ insertedId: "new3" });
+
+  // Setup countDocuments to return 0 by default (no existing reminders)
+  mockCollection.countDocuments.mockResolvedValue(0);
   
   // Mock request cookies
   jest.spyOn(app.request, 'get').mockImplementation(function(name) {
@@ -112,6 +154,21 @@ beforeAll(async () => {
       return 'userId=user123';
     }
     return this.headers && this.headers[name.toLowerCase()];
+  });
+
+  // Add mocks for the specific collection implementations needed for event reminders
+  mockDb.collection.mockImplementation((collectionName) => {
+    if (collectionName === "events") {
+      return {
+        ...mockCollection,
+        find: jest.fn().mockImplementation(() => {
+          return {
+            toArray: jest.fn().mockResolvedValue(mockEvents)
+          };
+        })
+      };
+    }
+    return mockCollection;
   });
 });
 
@@ -254,5 +311,68 @@ describe("Notification API", () => {
       
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Error marking all notifications as read");
+  });
+
+  // New tests for event reminders
+  describe("Event Reminders", () => {
+    it("should send event reminders for events in the specified days", async () => {
+      const res = await request(app)
+        .get("/api/notifications/send-reminders?reminderDays=3")
+        .set('Cookie', ['userId=admin123']);
+        
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body).toHaveProperty('notificationsCreated');
+    });
+
+    it("should return 400 for invalid reminderDays parameter", async () => {
+      const res = await request(app)
+        .get("/api/notifications/send-reminders?reminderDays=-1")
+        .set('Cookie', ['userId=admin123']);
+        
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toBe("Invalid reminderDays parameter");
+    });
+
+    it("should handle errors when sending reminders", async () => {
+      const mockCollection = mockDb.collection();
+      
+      // Force an error by making one of the methods throw
+      mockDb.collection.mockImplementationOnce(() => {
+        throw new Error("Database error");
+      });
+      
+      const res = await request(app)
+        .get("/api/notifications/send-reminders")
+        .set('Cookie', ['userId=admin123']);
+        
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe("Error sending event reminders");
+    });
+
+    it("should process multiple reminder intervals", async () => {
+      const res = await request(app)
+        .get("/api/notifications/check-all-reminders")
+        .set('Cookie', ['userId=admin123']);
+        
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.remindersSent).toHaveProperty('1_days');
+      expect(res.body.remindersSent).toHaveProperty('3_days');
+      expect(res.body.remindersSent).toHaveProperty('7_days');
+    });
+
+    it("should not create duplicate reminders", async () => {
+      // First make countDocuments return 1 to simulate existing reminders
+      const mockCollection = mockDb.collection();
+      mockCollection.countDocuments.mockResolvedValue(1);
+      
+      const res = await request(app)
+        .get("/api/notifications/send-reminders?reminderDays=3")
+        .set('Cookie', ['userId=admin123']);
+        
+      expect(res.statusCode).toBe(200);
+      expect(res.body.notificationsCreated).toBe(0); // No new notifications should be created
+    });
   });
 });
