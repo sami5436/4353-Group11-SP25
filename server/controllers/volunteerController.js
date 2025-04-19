@@ -32,15 +32,18 @@ const getVolunteerById = async (req, res) => {
 }
 const getUpcomingEventsByVolunteerId = async (req, res) => {
   const volunteerId = req.params.id;
+  const manualAssignmentEventId = "67deab0b0f1bbc40a5d44d61"; // The ID of the event to exclude
 
   try {
     const eventsCollection = db.collection("events");
 
     // Find upcoming events where this volunteer ID exists in the volunteers array
+    // But exclude the manual assignment event
     const upcomingEvents = await eventsCollection
       .find({
         volunteers: volunteerId,
         status: "Upcoming",
+        _id: { $ne: new ObjectId(manualAssignmentEventId) } // Exclude manual assignment event
       })
       .toArray();
 
@@ -62,6 +65,7 @@ const getUpcomingEventsByVolunteerId = async (req, res) => {
 
 const getEventsByVolunteerId = async (req, res) => {
   const volunteerId = req.params.id;
+  const manualAssignmentEventId = "67deab0b0f1bbc40a5d44d61"; // The ID of the event to exclude
 
   try {
     // Validate the volunteer ID format
@@ -78,6 +82,7 @@ const getEventsByVolunteerId = async (req, res) => {
     const events = await eventsCollection
       .find({
         volunteers: volunteerId,
+        _id: { $ne: new ObjectId(manualAssignmentEventId) } // Exclude manual assignment event
       })
       .toArray();
 
@@ -113,7 +118,7 @@ const removeVolunteerFromEvent = async (req, res) => {
 
   try {
     // Validate IDs
-    let eventObjectId, volunteerObjectId;
+    let eventObjectId;
     
     try {
       eventObjectId = new ObjectId(eventId);
@@ -135,9 +140,14 @@ const removeVolunteerFromEvent = async (req, res) => {
       });
     }
 
+    // Remove volunteer from the volunteers array
+    // AND add them to the removed array (create it if it doesn't exist)
     const result = await eventsCollection.updateOne(
       { _id: eventObjectId },
-      { $pull: { volunteers: volunteerId } }
+      { 
+        $pull: { volunteers: volunteerId },
+        $addToSet: { removed: volunteerId } // Creates the array if it doesn't exist
+      }
     );
 
     if (result.modifiedCount === 0) {

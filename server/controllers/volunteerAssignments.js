@@ -37,9 +37,24 @@ const assignVolunteer = async (req, res) => {
     
     const allEvents = await eventsCollection.find({}).toArray();
     
+    // Get events the volunteer is already assigned to
+    const assignedEvents = allEvents.filter(event => {
+      const eventVolunteers = event.volunteers || [];
+      return eventVolunteers.includes(volunteerId);
+    });
+    
+    // Check if volunteer is in the fallback event
+    const isInFallbackEvent = assignedEvents.some(event => 
+      event._id.toString() === fallbackEventId
+    );
+    
+    // Get events the volunteer is not assigned to yet AND hasn't removed themselves from
     const availableEvents = allEvents.filter(event => {
       const eventVolunteers = event.volunteers || [];
-      return !eventVolunteers.includes(volunteerId);
+      const removedVolunteers = event.removed || [];
+      
+      // Event is available if volunteer is not assigned AND hasn't removed themselves
+      return !eventVolunteers.includes(volunteerId) && !removedVolunteers.includes(volunteerId);
     });
     
     const scoredEvents = availableEvents.map(event => {
@@ -49,8 +64,9 @@ const assignVolunteer = async (req, res) => {
         score += 1;
       }
       
-      const eventSkills = event.skills || [];
-      const volunteerSkills = volunteer.skills || [];
+      const eventSkills = (event.skills || []).map(skill => skill.toLowerCase());
+      const volunteerSkills = (volunteer.skills || []).map(skill => skill.toLowerCase());
+      
       const hasMatchingSkill = volunteerSkills.some(skill => 
         eventSkills.includes(skill)
       );
@@ -98,61 +114,145 @@ const assignVolunteer = async (req, res) => {
       matches: e.matches
     })));
     
-    if (scoredEvents.length > 1) {
-      const bestMatch = scoredEvents[0];
-      console.log(`Best match: ${bestMatch.event.name} with score ${bestMatch.score}`);
-      console.log(`Match details: ${JSON.stringify(bestMatch.matches)}`);
-    }
+    // Get all events with a score of 2 or higher
+    const goodMatches = scoredEvents.filter(scored => scored.score >= 2);
     
-    // Assign to the best match if it has at least 1 matching criterion
-    let matchingEvent = null;
-    let assignedToFallback = false;
-    
-    if (scoredEvents.length > 0 && scoredEvents[0].score >= 1) {
-      matchingEvent = scoredEvents[0].event;
-      console.log("Found matching event with score:", scoredEvents[0].score);
-    } else {
-      // Use fallback if no good match
-      assignedToFallback = true;
-      matchingEvent = await eventsCollection.findOne({ _id: new ObjectId(fallbackEventId) });
-      console.log("No good match found, using fallback event");
+    if (goodMatches.length > 0) {
+      console.log(`Found ${goodMatches.length} good matches with score >= 2`);
       
-      if (!matchingEvent) {
-        return res.status(404).json({ error: "Fallback event not found" });
+      // If volunteer is in fallback event, remove them from it
+      if (isInFallbackEvent) {
+        await eventsCollection.updateOne(
+          { _id: new ObjectId(fallbackEventId) },
+          { $pull: { volunteers: volunteerId } }
+        );
+        console.log("Removed volunteer from fallback event after good match found");
+      }
+      
+      const notificationsCollection = db.collection("notifications");
+      const assignedEventsData = [];
+      
+      // Assign volunteer to all good matches
+      for (const match of goodMatches) {
+        const matchingEvent = match.event;
+        
+        // Check if volunteer is already assigned to this specific event
+        const isAlreadyAssignedToThisEvent = assignedEvents.some(event => 
+          event._id.toString() === matchingEvent._id.toString()
+        );
+        
+        if (!isAlreadyAssignedToThisEvent) {
+          // Add volunteer to the matching event
+          await eventsCollection.updateOne(
+            { _id: matchingEvent._id },
+            { $push: { volunteers: volunteerId } }
+          );
+          
+          // Create notification for this event assignment
+          const newEventNotification = {
+            recipientId: volunteerId,
+            recipientType: "volunteer",
+            message: `New Event Assigned: ${matchingEvent.name}`,
+            timestamp: new Date(),
+            read: false,
+            details: `You have been assigned to the event "${matchingEvent.name}". Please check your schedule and event details.`,
+            notificationType: "new_event",
+            metadata: {
+              eventId: matchingEvent._id.toString()
+            }
+          };
+          
+          await notificationsCollection.insertOne(newEventNotification);
+          
+          // Get updated event details with the volunteer added
+          const updatedEvent = await eventsCollection.findOne({ _id: matchingEvent._id });
+          assignedEventsData.push({
+            ...updatedEvent,
+            volunteered: true,
+            matchScore: match.score,
+            matchDetails: match.matches
+          });
+        }
+      }
+      
+      res.status(200).json({
+        message: `Volunteer assigned to ${assignedEventsData.length} events successfully`,
+        events: assignedEventsData,
+        removedFromFallback: isInFallbackEvent
+      });
+    } else {
+      // Special case: Check if fallback event is in the "removed" list for this volunteer
+      let fallbackEventRemoved = false;
+      const fallbackEvent = await eventsCollection.findOne({ _id: new ObjectId(fallbackEventId) });
+      if (fallbackEvent) {
+        const removedVolunteers = fallbackEvent.removed || [];
+        fallbackEventRemoved = removedVolunteers.includes(volunteerId);
+      }
+      
+      // If no good match found and volunteer isn't already in fallback and hasn't removed themselves from fallback
+      if (!isInFallbackEvent && !fallbackEventRemoved) {
+        // Use fallback event
+        const matchingEvent = fallbackEvent;
+        console.log("No good match found, using fallback event");
+        
+        if (!matchingEvent) {
+          return res.status(404).json({ error: "Fallback event not found" });
+        }
+        
+        // Add volunteer to fallback event
+        await eventsCollection.updateOne(
+          { _id: matchingEvent._id },
+          { $push: { volunteers: volunteerId } }
+        );
+        
+        const notificationsCollection = db.collection("notifications");
+        
+        const newEventNotification = {
+          recipientId: volunteerId,
+          recipientType: "volunteer",
+          message: `New Event Assigned: ${matchingEvent.name}`,
+          timestamp: new Date(),
+          read: false,
+          details: `You have been assigned to the event "${matchingEvent.name}". Please check your schedule and event details.`,
+          notificationType: "new_event",
+          metadata: {
+            eventId: matchingEvent._id.toString()
+          }
+        };
+        
+        await notificationsCollection.insertOne(newEventNotification);
+        
+        const updatedEvent = await eventsCollection.findOne({ _id: matchingEvent._id });
+        
+        res.status(200).json({
+          message: "Volunteer assigned to fallback event",
+          events: [{
+            ...updatedEvent,
+            volunteered: true,
+            matchScore: 0,
+            matchDetails: null
+          }]
+        });
+      } else if (isInFallbackEvent) {
+        // Volunteer is already in fallback event and no good match found
+        res.status(200).json({
+          message: "Volunteer already assigned to fallback event, no better match found",
+          events: [{
+            ...fallbackEvent,
+            volunteered: true,
+            matchScore: 0,
+            matchDetails: null
+          }]
+        });
+      } else {
+        // Volunteer has removed themselves from the fallback event and no good match found
+        res.status(200).json({
+          message: "No suitable events found and volunteer has opted out of the default event",
+          noAssignment: true,
+          events: []
+        });
       }
     }
-    
-    // Add volunteer to event
-    await eventsCollection.updateOne(
-      { _id: matchingEvent._id },
-      { $push: { volunteers: volunteerId } }
-    );
-
-    const notificationsCollection = db.collection("notifications");
-
-    const newEventNotification = {
-      recipientId: volunteerId,
-      recipientType: "volunteer",
-      message: `New Event Assigned: ${matchingEvent.name}`,
-      timestamp: new Date(),
-      read: false,
-      details: `You have been assigned to the event "${matchingEvent.name}". Please check your schedule and event details.`,
-      notificationType: "new_event"
-    };
-
-    await notificationsCollection.insertOne(newEventNotification);
-    
-    const updatedEvent = await eventsCollection.findOne({ _id: matchingEvent._id });
-    
-    res.status(200).json({
-      message: `Volunteer assigned ${assignedToFallback ? "to fallback event" : "successfully"}`,
-      matchScore: assignedToFallback ? 0 : scoredEvents[0].score,
-      matchDetails: assignedToFallback ? null : scoredEvents[0].matches,
-      event: {
-        ...updatedEvent,
-        volunteered: true
-      }
-    });
   } catch (error) {
     console.error("Error in assignVolunteer:", error);
     res.status(500).json({ error: "Error assigning volunteer", details: error.message });

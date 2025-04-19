@@ -8,6 +8,7 @@ const getNotifications = async (req, res) => {
   try {
     const { type, unread, recipientType } = req.query;
     const userId = req.cookies.userId;
+    const manualAssignmentEventId = "67deab0b0f1bbc40a5d44d61"; // ID of the manual assignment event
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: No user ID found in cookies" });
@@ -37,6 +38,19 @@ const getNotifications = async (req, res) => {
     if (unread === "true") {
       query.read = false;
     }
+
+    // Exclude notifications related to the manual assignment event
+    query.$and = [
+      {
+        $or: [
+          { "metadata.eventId": { $ne: manualAssignmentEventId } }, 
+          { "metadata.eventId": { $exists: false } }
+        ]
+      }
+    ];
+
+    // Also exclude notifications where the message contains the manual assignment event name
+    query.message = { $not: /NEEDS MANUAL ASSIGNMENT/i };
 
     const notificationsCollection = db.collection("notifications");
     const notifications = await notificationsCollection
@@ -139,6 +153,7 @@ const sendEventReminders = async (req, res) => {
   try {
     const { reminderDays = 3 } = req.query; 
     const daysBeforeEvent = parseInt(reminderDays);
+    const manualAssignmentEventId = "67deab0b0f1bbc40a5d44d61"; // ID of the manual assignment event
     
     if (isNaN(daysBeforeEvent) || daysBeforeEvent < 0) {
       return res.status(400).json({ message: "Invalid reminderDays parameter" });
@@ -158,7 +173,8 @@ const sendEventReminders = async (req, res) => {
     const upcomingEvents = await eventsCollection.find({
       date: formattedTargetDate,
       status: "Upcoming",
-      volunteers: { $exists: true, $ne: [] }
+      volunteers: { $exists: true, $ne: [] },
+      _id: { $ne: new ObjectId(manualAssignmentEventId) } // Exclude manual assignment event
     }).toArray();
     
     let notificationsCreated = 0;
@@ -236,7 +252,6 @@ const sendEventReminders = async (req, res) => {
     });
   }
 };
-
 
 const checkAndSendAllReminders = async (req, res) => {
   try {
