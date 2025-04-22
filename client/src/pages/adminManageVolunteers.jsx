@@ -59,7 +59,7 @@ function AdminManageVolunteers() {
     setIsLoading(true);
 
     axios
-      .get("http://localhost:5001/api/events/allVolunteers")
+      .get("https://four353-group11-sp25.onrender.com/events/allVolunteers")
       .then((res) => {
         console.log("All volunteers data:", res.data);
 
@@ -77,7 +77,7 @@ function AdminManageVolunteers() {
     if (Object.keys(volunteerDetails).length === 0) return; // Prevent running with empty data
 
     axios
-      .get("http://localhost:5001/api/events")
+      .get("https://four353-group11-sp25.onrender.com/events")
       .then((res) => {
         console.log("Events data:", res.data);
         setEvents(res.data);
@@ -155,7 +155,7 @@ function AdminManageVolunteers() {
 
     // Send update to backend with source event ID for removal
     axios
-      .post("http://localhost:5001/api/events/addVolunteer", {
+      .post("https://four353-group11-sp25.onrender.com/events/addVolunteer", {
         eventId: targetEvent._id,
         volunteerId: volunteerId,
         sourceEventId: sourceEventId,

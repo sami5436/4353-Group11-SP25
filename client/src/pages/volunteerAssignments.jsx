@@ -21,7 +21,7 @@ function VolunteerAssignments() {
     const volunteerId = Cookies.get("userId"); // Retrieve userId from cookie
       
     axios
-      .get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}/upcoming`)
+      .get(`https://four353-group11-sp25.onrender.com/volunteers/volunteer/${volunteerId}/upcoming`)
       .then((response) => {
         setAssignedEvents(response.data);
       })
@@ -47,7 +47,7 @@ function VolunteerAssignments() {
     const volunteerId = Cookies.get("userId");
     
     axios
-      .delete(`http://localhost:5001/api/volunteers/event/${eventId}/volunteer/${volunteerId}`)
+      .delete(`https://four353-group11-sp25.onrender.com/volunteers/event/${eventId}/volunteer/${volunteerId}`)
       .then(() => {
         // Remove the event from the local state
         setAssignedEvents(assignedEvents.filter(event => event._id !== eventId));

@@ -12,7 +12,7 @@ const VolunteerNotifications = () => {
 
     const checkEventReminders = async () => {
         try {
-            await axios.get('http://localhost:5001/api/notifications/check-all-reminders', 
+            await axios.get('https://four353-group11-sp25.onrender.com/notifications/check-all-reminders', 
                 { withCredentials: true }
             );
             console.log("Reminder check completed");
@@ -31,7 +31,7 @@ const VolunteerNotifications = () => {
         const loadData = async () => {
             await checkEventReminders();
     
-            let url = `http://localhost:5001/api/notifications?recipientType=${recipientType}`;
+            let url = `https://four353-group11-sp25.onrender.com/notifications?recipientType=${recipientType}`;
             if (filter === 'unread') {
                 url += '&unread=true';
             } else if (filter !== 'all') {
@@ -50,7 +50,7 @@ const VolunteerNotifications = () => {
     }, [filter]);
 
     const markAllAsRead = () => {
-        axios.put(`http://localhost:5001/api/notifications/markAllRead?recipientType=${recipientType}`, 
+        axios.put(`https://four353-group11-sp25.onrender.com/notifications/markAllRead?recipientType=${recipientType}`, 
             {}, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
@@ -62,7 +62,7 @@ const VolunteerNotifications = () => {
     };
 
     const markAsRead = (id) => {
-        axios.put(`http://localhost:5001/api/notifications/${id}/read`, {}, { withCredentials: true })
+        axios.put(`https://four353-group11-sp25.onrender.com/notifications/${id}/read`, {}, { withCredentials: true })
             .then(res => {
                 setNotifications(notifications.map(notif =>
                     notif._id === id ? { ...notif, read: true } : notif

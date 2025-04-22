@@ -28,7 +28,7 @@ const AdminDashboard = () => {
             return;
         }
     
-        axios.get("http://localhost:5001/api/adminProfile", { withCredentials: true })
+        axios.get("https://four353-group11-sp25.onrender.com/adminProfile", { withCredentials: true })
             .then((res) => {
                 setProfileData(res.data);
                 setIsLoading(false);
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
             return;
         }
         
-        axios.put("http://localhost:5001/api/adminProfile", formValues, { withCredentials: true })
+        axios.put("https://four353-group11-sp25.onrender.com/adminProfile", formValues, { withCredentials: true })
             .then((res) => {
                 setProfileData(res.data);
                 if (res.data.fullySignedUp) {

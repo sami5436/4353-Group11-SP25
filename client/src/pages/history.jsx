@@ -11,7 +11,7 @@ function History() {
   useEffect(() => {
     const volunteerId = Cookies.get("userId"); 
     
-    axios.get(`http://localhost:5001/api/volunteers/volunteer/${volunteerId}`)
+    axios.get(`https://four353-group11-sp25.onrender.com/volunteers/volunteer/${volunteerId}`)
       .then((res) => {
         const updatedEvents = res.data.map(event => ({
           ...event,

@@ -125,7 +125,7 @@ function Profile() {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`
+          `https://four353-group11-sp25.onrender.com/volunteerProfile/volunteer/${volunteerId}`
         );
         console.log("Profile data fetched:", response.data);
 
@@ -155,7 +155,7 @@ function Profile() {
         }
 
         await axios.post(
-          `http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`
+          `https://four353-group11-sp25.onrender.com/volunteerAssignments/assignVolunteer/${volunteerId}`
         );
       } catch (error) {
         console.error("Error fetching profile data:", error);
@@ -217,7 +217,7 @@ function Profile() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/volunteerProfile/volunteer/${volunteerId}`,
+        `https://four353-group11-sp25.onrender.com/volunteerProfile/volunteer/${volunteerId}`,
         formattedData
       );
       setProfileData(response.data.volunteerProfile);
@@ -225,7 +225,7 @@ function Profile() {
       setErrors([]);
 
       await axios.post(
-        `http://localhost:5001/api/volunteerAssignments/assignVolunteer/${volunteerId}`
+        `https://four353-group11-sp25.onrender.com/volunteerAssignments/assignVolunteer/${volunteerId}`
       );
     } catch (error) {
       if (error.response && error.response.data.errors) {

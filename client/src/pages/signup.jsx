@@ -67,7 +67,7 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5001/api/auth/signup", formData);
+      const response = await axios.post("https://four353-group11-sp25.onrender.com/auth/signup", formData);
       console.log(response.data);
       navigate("/email-validate", { state: { email: formData.email } });
     } catch (err) {
