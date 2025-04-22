@@ -9,7 +9,7 @@ const EventHistory = () => {
   const [errors, setErrors] = useState({});
   const [eventHistory, setEventHistory] = useState([]);
 
-  const API_BASE_URL = "https://four353-group11-sp25.onrender.com";
+  const API_BASE_URL = "https://four353-group11-sp25.onrender.com/api";
 
   // Fetch events on component mount
   useEffect(() => {

@@ -29,7 +29,7 @@ function Login() {
     }
  
     try {
-      const response = await axios.post("https://four353-group11-sp25.onrender.com/auth/login", {
+      const response = await axios.post("https://four353-group11-sp25.onrender.com/api/auth/login", {
         email: formData.email,
         password: formData.password,
       });

@@ -17,7 +17,7 @@ const AdminNotifications = () => {
             return;
         }
 
-        let url = `https://four353-group11-sp25.onrender.com/notifications?recipientType=${recipientType}`;
+        let url = `https://four353-group11-sp25.onrender.com/api/notifications?recipientType=${recipientType}`;
         if (filter === 'unread') {
           url += '&unread=true';
         } else if (filter !== 'all') {
@@ -30,7 +30,7 @@ const AdminNotifications = () => {
     }, [filter]);
       
     const markAllAsRead = () => {
-        axios.put(`https://four353-group11-sp25.onrender.com/notifications/markAllRead?recipientType=${recipientType}`, 
+        axios.put(`https://four353-group11-sp25.onrender.com/api/notifications/markAllRead?recipientType=${recipientType}`, 
             {}, { withCredentials: true })
             .then(res => {
                 if (res.data.success) {
@@ -42,7 +42,7 @@ const AdminNotifications = () => {
     };
 
     const markAsRead = (id) => {
-        axios.put(`https://four353-group11-sp25.onrender.com/notifications/${id}/read`, {}, { withCredentials: true })
+        axios.put(`https://four353-group11-sp25.onrender.com/api/notifications/${id}/read`, {}, { withCredentials: true })
             .then(res => {
                 setNotifications(notifications.map(notif =>
                     notif._id === id ? { ...notif, read: true } : notif

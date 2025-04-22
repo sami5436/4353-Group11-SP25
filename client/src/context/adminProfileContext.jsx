@@ -17,7 +17,7 @@ export function ProfileProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios.get("https://four353-group11-sp25.onrender.com/adminProfile", { withCredentials: true })
+    axios.get("https://four353-group11-sp25.onrender.com/api/adminProfile", { withCredentials: true })
       .then((res) => {
         setProfileData(res.data);
         setIsLoading(false);

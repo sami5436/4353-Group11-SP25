@@ -16,7 +16,7 @@ const NotificationDropdown = ({ userRole = 'admin' }) => {
             return;
         }
 
-        axios.get(`https://four353-group11-sp25.onrender.com/notifications?recipientType=${userRole}&unread=true`, 
+        axios.get(`https://four353-group11-sp25.onrender.com/api/notifications?recipientType=${userRole}&unread=true`, 
             { withCredentials: true })
             .then((res) => setNotifications(res.data))
             .catch((err) => console.error("Error fetching notifications:", err));
@@ -25,7 +25,7 @@ const NotificationDropdown = ({ userRole = 'admin' }) => {
     const unreadCount = notifications.filter(notif => !notif.read).length;
 
     const markAsRead = (id) => {
-        axios.put(`https://four353-group11-sp25.onrender.com/notifications/${id}/read`, {}, 
+        axios.put(`https://four353-group11-sp25.onrender.com/api/notifications/${id}/read`, {}, 
             { withCredentials: true }) 
             .then(() => {
                 setNotifications(notifications.map(notif =>
