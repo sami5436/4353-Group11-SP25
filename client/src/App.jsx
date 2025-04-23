@@ -1,21 +1,22 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import History from "./pages/history";
+import History from "./pages/history"; // volunteer history
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
-import Profile from "./pages/profile";
+import Profile from "./pages/profile"; // volunteer profile
 import AdminDashboard from "./pages/adminDashboard";
 import AdminNotifications from "./pages/adminNotifications";
 import VolunteerNotifications from "./pages/volunteerNotifications";
 import Navbar from "./components/navbar";
 import EventHistory from "./components/adminEventHistory";
-import VolunteerAssignments from "./pages/volunteerAssignments";
+import VolunteerAssignments from "./pages/volunteerAssignments"; // volunteer assignments
 import AdminManageVolunteers from "./pages/adminManageVolunteers";
 import AdminEventsReport from "./pages/adminEventsReport";
 import Contactus from "./pages/contactus";
 import Aboutus from "./pages/aboutus";
 import EmailValidate from "./pages/EmailValidate";
 import { ProfileProvider } from "./context/adminProfileContext";
+import { VolunteerProfileProvider } from "./context/volunteerProfileContext";
 
 function App() {
   const location = useLocation();
@@ -43,16 +44,10 @@ function App() {
         <Route path="email-validate" element={<EmailValidate />} />
         <Route path="contact-us" element={<Contactus />} />
         <Route path="about-us" element={<Aboutus />} />
-        <Route path="volunteer/profile" element={<Profile />} />
+        {/* <Route path="volunteer/profile" element={<Profile />} />
         <Route path="volunteer/history" element={<History />} />
-        <Route
-          path="volunteer/assignments"
-          element={<VolunteerAssignments />}
-        />
-        <Route
-          path="volunteer/notifications"
-          element={<VolunteerNotifications />}
-        />
+        <Route path="volunteer/assignments" element={<VolunteerAssignments />} /> */}
+        {/* <Route path="volunteer/notifications" element={<VolunteerNotifications />} /> */}
 
         <Route
           path="/admin/*"
@@ -71,6 +66,21 @@ function App() {
             </ProfileProvider>
           }
         />
+
+        <Route
+          path="volunteer/*"
+          element={
+            <VolunteerProfileProvider>
+              <Routes>
+                <Route path="profile" element={<Profile />} />
+                <Route path="history" element={<History />} />
+                <Route path="assignments" element={<VolunteerAssignments />} />
+                <Route path="notifications" element={<VolunteerNotifications />} />
+              </Routes>
+            </VolunteerProfileProvider>
+          }
+        />
+
       </Routes>
     </>
   );
