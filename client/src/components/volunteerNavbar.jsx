@@ -2,9 +2,11 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Home, ClipboardList, Calendar, LogOut } from "lucide-react";
 import NotificationDropdown from "./notificationDropdown";
+import { useVolunteerProfile } from "../context/volunteerProfileContext";
 import Cookies from "js-cookie"; // Import js-cookie
 
 function VolunteerNavbar() {
+  const { volunteerProfileData } = useVolunteerProfile();
   const navigate = useNavigate(); // Use navigate for redirect
 
   const handleLogout = () => {
@@ -12,6 +14,9 @@ function VolunteerNavbar() {
     console.log("User ID cookie deleted");
     navigate("/"); // Redirect to home page after logout
   };
+
+  const rawStatus = volunteerProfileData.fullySignedUp;
+  const fullySignedUp = rawStatus === true || rawStatus === "true";
 
   return (
     <div className="w-64 bg-gradient-to-b from-emerald-900 to-emerald-600 text-white h-screen fixed top-0 left-0">
@@ -37,20 +42,29 @@ function VolunteerNavbar() {
             <span>My Profile</span>
           </Link>
 
-          <Link
-            to="/volunteer/assignments"
-            className="flex items-center space-x-2 text-gray-300 hover:text-white"
-          >
-            <ClipboardList size={20} />
-            <span>Volunteer Assignments</span>
-          </Link>
-          <Link
-            to="/volunteer/history"
-            className="flex items-center space-x-2 text-gray-300 hover:text-white"
-          >
-            <Calendar size={20} />
-            <span>Volunteer History</span>
-          </Link>
+           {/* Conditional links based on signup status */}
+           {fullySignedUp ? (
+            <>
+              <Link
+                to="/volunteer/assignments"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white"
+              >
+                <ClipboardList size={20} />
+                <span>Volunteer Assignments</span>
+              </Link>
+              <Link
+                to="/volunteer/history"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white"
+              >
+                <Calendar size={20} />
+                <span>Volunteer History</span>
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-gray-300">
+              Complete your profile to unlock features.
+            </p>
+          )}
 
           <button
             onClick={handleLogout}

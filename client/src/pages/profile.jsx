@@ -5,12 +5,14 @@ import CreatableSelect from "react-select/creatable";
 import axios from "axios";
 import DatePicker from "react-multi-date-picker";
 import "../styles/volunteerProfileAvailabilityStyling.css"; // Import the custom green theme
+import { useVolunteerProfile } from "../context/volunteerProfileContext";
 import Cookies from "js-cookie";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [showSecondAddress, setShowSecondAddress] = useState(false);
   const [profileData, setProfileData] = useState(null);
+  const { setVolunteerProfileData } = useVolunteerProfile();
   const [editedData, setEditedData] = useState({
     firstName: "",
     lastName: "",
@@ -221,6 +223,7 @@ function Profile() {
         formattedData
       );
       setProfileData(response.data.volunteerProfile);
+      setVolunteerProfileData(response.data.volunteerProfile);
       setIsEditing(false);
       setErrors([]);
 
