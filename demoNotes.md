@@ -26,7 +26,8 @@ _volunteer acct + volunteer assignment (volunteer)_
 ## 5 - gaby
 _event history (admin)_
 - log back into admin
-- create a new event and modify
+- note that notification for new user appears
+- create a new event and modify - mention notification (event creation and modification) 
 - navigate to report and show functionality
 
 ## 6 - sami
@@ -37,5 +38,6 @@ _manage volunteers_
 _existing volunteer_
 - yusuf, ill provide login info for you to use later today in this doc
 - login into volunteer, navigate to volunteer assignment and remove an event that user does not want
+- make a note that the notifications includes an update to the event that the admin modified
 - navigate to history and show
 
