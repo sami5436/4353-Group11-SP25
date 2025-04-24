@@ -242,17 +242,9 @@ const EventHistory = () => {
   const availableSkills = [
     "Administrative",
     "Arts & Crafts",
-<<<<<<< HEAD
     "Language Translation",
     "Manual Labor",
     "Public Speaking",
-=======
-    "Community Outreach",
-    "Conflict Resolution",
-    "Construction",
-    "Cooking",
-    "Customer Service",
->>>>>>> 32070e43debf72e1d945a0fb8521f2f6d7c906a2
     "Event Coordination",
     "Event Planning",
     "First Aid",
@@ -272,7 +264,6 @@ const EventHistory = () => {
     "Social Media",
     "Teaching",
     "Technical Support",
-<<<<<<< HEAD
     "Administrative",
     "Community Outreach",
     "Conflict Resolution",
@@ -294,11 +285,6 @@ const EventHistory = () => {
     "Tutoring",
     "Web Development",
     "Writing",
-=======
-    "Tutoring",
-    "Web Development",
-    "Writing"
->>>>>>> 32070e43debf72e1d945a0fb8521f2f6d7c906a2
   ];
 
   const EventsMap = ({ events }) => {
