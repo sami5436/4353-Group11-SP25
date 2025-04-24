@@ -240,15 +240,35 @@ const EventHistory = () => {
   const defaultCenter = { lat: 39.8283, lng: -98.5795 };
 
   const availableSkills = [
+    "Administrative",
     "Arts & Crafts",
-    "Language Translation",
-    "First Aid & CPR",
-    "Manual Labor",
-    "Public Speaking",
+    "Community Outreach",
+    "Conflict Resolution",
+    "Construction",
+    "Cooking",
+    "Customer Service",
     "Event Coordination",
-    "Teaching",
+    "Event Planning",
+    "First Aid",
     "Food Services",
+    "Fundraising",
+    "Gardening",
+    "Graphic Design",
+    "IT Support",
+    "Language Skills",
+    "Language Translation",
+    "Leadership",
+    "Manual Labor",
+    "Marketing",
+    "Photography",
+    "Project Management",
+    "Public Speaking",
+    "Social Media",
+    "Teaching",
     "Technical Support",
+    "Tutoring",
+    "Web Development",
+    "Writing"
   ];
 
   const EventsMap = ({ events }) => {
