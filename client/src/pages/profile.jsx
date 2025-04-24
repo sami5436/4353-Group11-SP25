@@ -90,28 +90,34 @@ function Profile() {
 
   const skillOptions = [
     "Administrative",
+    "Arts & Crafts",
     "Community Outreach",
     "Conflict Resolution",
     "Construction",
     "Cooking",
     "Customer Service",
+    "Event Coordination",
     "Event Planning",
     "First Aid",
+    "Food Services",
     "Fundraising",
     "Gardening",
     "Graphic Design",
     "IT Support",
     "Language Skills",
+    "Language Translation",
     "Leadership",
+    "Manual Labor",
     "Marketing",
     "Photography",
     "Project Management",
     "Public Speaking",
     "Social Media",
     "Teaching",
+    "Technical Support",
     "Tutoring",
     "Web Development",
-    "Writing",
+    "Writing"
   ];
 
   // Convert skillOptions array to format required by react-select
