@@ -12,7 +12,7 @@ _tech used_
 _admin acct + auth_
 - make an account - admin.
 - mention auth and encryption of passwords
-- fill in admin info
+- fill in admin info (only name and phone number)
   
 ## 3 - sami
 _manage events (admin)_
